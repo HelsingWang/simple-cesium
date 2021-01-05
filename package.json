@@ -2,7 +2,8 @@
   "name": "simple-cesium",
   "version": "0.0.1",
   "dependencies": {
-    "cesium": "^1.76.0"
+    "cesium": "^1.76.0",
+    "cesium-navigation-es6": "^1.1.7"
   },
   "devDependencies": {
     "clean-webpack-plugin": "^3.0.0",
@@ -25,11 +26,24 @@
     "start": "cross-env NODE_ENV=development node_modules/.bin/webpack serve --progress --config webpack.config.js --open chrome --hot"
   },
   "keywords": [
-    "Simple",
+    "3D",
     "Cesium",
-    "Three",
-    "GIS"
+    "GIS",
+    "globe",
+    "map",
+    "webgl"
   ],
-  "author": "Helsing",
-  "license": "Apache-2.0"
+  "author": {
+    "name": "Helsing Wang",
+    "url": "http://helsing.wang"
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HelsingWang/simple-cesium.git"
+  },
+  "bugs": {
+    "url": "https://github.com/HelsingWang/simple-cesium/issues",
+    "email": "silver_fox@sina.com"
+  }
 }
