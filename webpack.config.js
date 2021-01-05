@@ -18,8 +18,8 @@ const config = {
     }, // 入口：string | object | array。这里应用程序开始执行，webpack开始打包。
     output: {
         filename: onePackage ? "[name].all.js" : "[name].js", // 输出文件名："[name].[hash:8].js", "bundle.js" | "[name].js" | "[chunkhash].js"。
-        // publicPath: "/assets/", // 输出解析文件的目录，设置之后所有资源文件会自动加上这个路径，url地址是相对于HTML页面的。
         path: path.resolve(__dirname, "dist"), // path.join(__dirname,'dist'), // 输出路径，一般为绝对路径。
+        // publicPath: "/assets/", // 输出解析文件的目录，设置之后所有资源文件会自动加上这个路径，url地址是相对于HTML页面的。
         chunkFilename: "[name].js", // 未被列入entry中，却又需要被打包出来的文件命名配置。
         library: "SimpleCesium", // 导出库的名称。
         libraryTarget: "umd" // 导出库的类型。常用umd模式，让输出的内容支持amd、commonJS模式加载。
@@ -126,7 +126,12 @@ const config = {
         //     name: 'simple-cesium.manifest'
         // },
         // minimize: nodeEnv === 'production', // 是否压缩代码。
-    }
+    },
+    resolve: {
+        alias: {
+            'cesium': '/node_modules/cesium' // 在resolve中设置cesium别名，这样在引入的时候就可以根据别名找到Cesium的包。
+        }
+    },
 };
 
 module.exports = config;
