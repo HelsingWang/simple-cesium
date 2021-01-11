@@ -1,0 +1,12 @@
+.sc-widget-content label {
+    display: flex;
+    align-items: center;
+    height: 25px;
+}
+.sc-widget-content div span:after {
+    content: '';
+    width: 60%;
+    position: absolute;
+    border-top: 1px solid #c8c8c8;
+    margin: 8px 4px;
+}
