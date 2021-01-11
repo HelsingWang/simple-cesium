@@ -39,6 +39,17 @@ const config = {
                 use: ["style-loader", 'css-loader'] // 针对css文件使用的loader，注意有先后顺序，数组项越靠后越先执行。
             },
             {
+                test: /\.html$/,
+                loader: 'html-loader',
+                include: [
+                    path.resolve(__dirname, "src")
+                ],
+                exclude: [
+                    // /node_modules/,
+                    path.resolve(__dirname, "public") // 与html-webpack-plugin插件冲突，会导致title无法替换，因此排除此目录。
+                ]
+            },
+            {
                 test: /\.(png|jpg|jpeg|gif|svg)$/,
                 loader: "url-loader",
                 options: {
