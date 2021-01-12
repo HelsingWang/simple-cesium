@@ -102,7 +102,7 @@ class MapOptionsViewModel {
         this._eventHandler.destroy();
         this._removePostRenderEvent();
         // this._frustumsSubscription.dispose();
-        for (let i = this._subscribes.length; i >= 0; i--) {
+        for (let i = this._subscribes.length - 1; i >= 0; i--) {
             this._subscribes[i].dispose();
             this._subscribes.pop();
         }
@@ -120,13 +120,6 @@ class MapOptionsViewModel {
                     obj[prop] = !that[name];
                 }
             });
-            // .subscribe(value => {
-            //     obj[prop] = that[name];//value;
-            //     that._scene.requestRender();
-            //     if (name === "sceneEnableCollisionDetection"){
-            //         obj[prop] = !value;
-            //     }
-            // });
         this._subscribes.push(result);
         console.log(this.globeShowGroundAtmosphere);
     }

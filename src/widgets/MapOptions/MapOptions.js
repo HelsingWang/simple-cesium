@@ -37,13 +37,21 @@ class MapOptions {
         if (!defined(options)) {
             throw new DeveloperError("container is required.");
         }
+        const that = this;
         // const scene = viewer.scene;
         let container = options.container;
         typeof options === "string" && (container = options);
         container = getElement(container);
         const element = document.createElement("div");
         element.className = "sc-widget";
-        insertHtml(element, MapOptionsHtml);
+        insertHtml(element, {
+            content: MapOptionsHtml, delay:1000, callback: () => {
+                const close = getElement(".sc-widget-bar-close");
+                close && close.addEventListener("click", () => {
+                    that.destroy();
+                }, false);
+            }
+        });
         container.appendChild(element);
         const viewModel = new MapOptionsViewModel(viewer, element);
 

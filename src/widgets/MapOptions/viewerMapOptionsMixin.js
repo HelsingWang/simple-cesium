@@ -43,6 +43,7 @@ function viewerMapOptionsMixin(viewer, options = {}) {
             get: function () {
                 return widget;
             },
+            configurable: true
         },
     });
 }

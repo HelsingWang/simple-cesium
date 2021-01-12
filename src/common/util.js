@@ -489,7 +489,7 @@ function insertHtml(srcNodeRef, options) {
         }
 
         if (typeof (callback) === "function") {
-            setTimeout(callback(), delay || 100);
+            setTimeout(callback, delay || 100);
         }
     }
 }
@@ -790,7 +790,7 @@ function getJSON(url, async = true, callback = undefined) {
 
 export {
     addCssClass,
-
+    ajax,
     getAbsoluteTop,
     getAbsoluteLeft,
     getChildElement,
@@ -808,5 +808,4 @@ export {
     setStyle,
     setInnerText,
     showElement,
-
 }
