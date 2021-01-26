@@ -31,11 +31,15 @@ function getElement(query) {
     } else if (typeof (query) === "object") {
         if (isElement(query)) {
             element = query;
-        }
-    } else if (query instanceof Array) {
-        if (query.length > 0) {
-            if (typeof (query[0]) === "object") {
-                element = query[0];
+        } else if (query instanceof Array) {
+            const length = query.length;
+            if (length > 0) {
+                for (let i = 0; i < length; i++) {
+                    if (isElement(query[i])) {
+                        element = query[i];
+                        break;
+                    }
+                }
             }
         }
     }
@@ -89,9 +93,20 @@ function getElements(query) {
         if (isElement(query)) {
             elements = [];
             elements.push(query);
+        } else if (query instanceof Array) {
+            const length = query.length;
+            if (length > 0) {
+                elements = [];
+                let element;
+                for (let i = 0; i < length; i++) {
+                    element = query[i];
+                    if (isElement(element)) {
+                        elements.push(element);
+                    }
+                }
+                (elements.length === 0) && (elements = undefined);
+            }
         }
-    } else if (query instanceof Array) {
-        elements = query;
     }
     return elements;
 }
@@ -408,7 +423,7 @@ function getAbsoluteLeft(srcNodeRef) {
 function showOrHideElement(srcNodeRef, show, display) {
     display = display || "inherit";
     const elements = getElements(srcNodeRef);
-    if (elements) {
+    if (elements && elements.length > 0) {
         for (let i = 0; i < elements.length; i++) {
             const element = elements[i];
             if (typeof show === "boolean") {
@@ -788,9 +803,37 @@ function getJSON(url, async = true, callback = undefined) {
     }
 }
 
+/**
+ * 绑定事件。
+ *
+ * @author Helsing
+ * @date 2019/11/12
+ * @param {String|HTMLElement|Array} srcNodeRef 元素ID、元素或数组。
+ * @param {String|Function} [eventName='click'] 事件名称。
+ * @param {Function} [eventFunction] 事件方法。
+ */
+function bindEvent(srcNodeRef, eventName = "click", eventFunction = () => {
+    console.log(eventName + " event fired.")
+}) {
+    // 两参数重载
+    if (typeof eventName === "function"){
+        eventFunction = eventName;
+        eventName = "click";
+    }
+
+    const elements = getElements(srcNodeRef);
+    if (elements && elements.length > 0) {
+        const length = elements.length;
+        for (let i = 0; i < length; i++) {
+            elements[i].addEventListener(eventName, eventFunction, false)
+        }
+    }
+}
+
 export {
     addCssClass,
     ajax,
+    bindEvent,
     getAbsoluteTop,
     getAbsoluteLeft,
     getChildElement,

@@ -1,16 +1,14 @@
 import defined from "cesium/Source/Core/defined.js";
+import defaultValue from "cesium/Source/Core/defaultValue.js";
 import destroyObject from "cesium/Source/Core/destroyObject.js";
 import DeveloperError from "cesium/Source/Core/DeveloperError.js";
 import ScreenSpaceEventHandler from "cesium/Source/Core/ScreenSpaceEventHandler.js";
 import knockout from "cesium/Source/ThirdParty/knockout.js";
 
 class MapOptionsViewModel {
-    constructor(viewer, container) {
+    constructor(viewer) {
         if (!defined(viewer)) {
             throw new DeveloperError("viewer is required");
-        }
-        if (!defined(container)) {
-            throw new DeveloperError("container is required");
         }
 
         const that = this;
@@ -19,28 +17,30 @@ class MapOptionsViewModel {
         const canvas = scene.canvas;
         const eventHandler = new ScreenSpaceEventHandler(canvas);
 
-        this._scene = viewer.scene;
+        this._viewer = viewer;
         this._eventHandler = eventHandler;
         this._removePostRenderEvent = scene.postRender.addEventListener(function () {
             that._update();
         });
         this._subscribes = [];
 
-        Object.assign(this,{"viewerShadows":false,
-            "globeEnableLighting":false,
-            "globeShowGroundAtmosphere":true,
-            "globeTranslucencyEnabled":false,
-            "globeShow":false,
-            "globeDepthTestAgainstTerrain":false,
-            "globeWireFrame":false,
-            "sceneSkyAtmosphereShow":true,
-            "sceneFogEnabled":true,
-            "sceneRequestRenderMode":false,
-            "sceneLogarithmicDepthBuffer":false,
-            "sceneDebugShowFramesPerSecond":false,
-            "sceneDebugShowFrustumPlanes":false,
-            "sceneEnableCollisionDetection":false,
-            "sceneBloomEnabled":false})
+        Object.assign(this, {
+            "viewerShadows": defaultValue(viewer.shadows, false),
+            "globeEnableLighting": defaultValue(globe.enableLighting, false),
+            "globeShowGroundAtmosphere": defaultValue(globe.showGroundAtmosphere, true),
+            "globeTranslucencyEnabled": defaultValue(globe.translucency.enabled, false),
+            "globeShow": defaultValue(globe.show, true),
+            "globeDepthTestAgainstTerrain": defaultValue(globe.depthTestAgainstTerrain, false),
+            "globeWireFrame": defaultValue(globe._surface.tileProvider._debug.wireFrame, false),
+            "sceneSkyAtmosphereShow": defaultValue(scene.skyAtmosphere.show, true),
+            "sceneFogEnabled": defaultValue(scene.fog.enabled, true),
+            "sceneRequestRenderMode": defaultValue(scene.requestRenderMode, false),
+            "sceneLogarithmicDepthBuffer": defaultValue(scene.logarithmicDepthBuffer, false),
+            "sceneDebugShowFramesPerSecond": defaultValue(scene.debugShowFramesPerSecond, false),
+            "sceneDebugShowFrustumPlanes": defaultValue(scene.debugShowFrustumPlanes, false),
+            "sceneEnableCollisionDetection": defaultValue(scene.enableCollisionDetection, false),
+            "sceneBloomEnabled": defaultValue(scene.postProcessStages.bloom.enabled, false),
+        })
         knockout.track(this);
         /*knockout.track(this, [
             "viewerShadows",
@@ -65,8 +65,8 @@ class MapOptionsViewModel {
             ["globeShowGroundAtmosphere", globe, "showGroundAtmosphere"],
             ["globeTranslucencyEnabled", globe.translucency, "enabled"],
             ["globeShow", globe, "show"],
-            ["globeDepthTestAgainstTerrain", globe, "depthTestAgainstTerrain "],
-            ["globeWireFrame", globe._surface.tileProvider._debug, "wireframe "],
+            ["globeDepthTestAgainstTerrain", globe, "depthTestAgainstTerrain"],
+            ["globeWireFrame", globe._surface.tileProvider._debug, "wireframe"],
             ["sceneSkyAtmosphereShow", scene.skyAtmosphere, "show"],
             ["sceneFogEnabled", scene.fog, "enabled"],
             ["sceneRequestRenderMode", scene, "requestRenderMode"],
@@ -76,7 +76,7 @@ class MapOptionsViewModel {
             ["sceneEnableCollisionDetection", scene.screenSpaceCameraController, "enableCollisionDetection"],
             ["sceneBloomEnabled", scene.postProcessStages.bloom, "enabled"]
         ];
-        props.forEach(value => this.subscribe(value[0], value[1], value[2]));
+        props.forEach(value => this._subscribe(value[0], value[1], value[2]));
 
         // this._frustumsSubscription = knockout
         //     .getObservable(this, "sceneFrustums")
@@ -84,23 +84,11 @@ class MapOptionsViewModel {
         //         scene.debugShowFrustums = val;
         //         scene.requestRender();
         //     });
-        // if (name === "sceneBloomEnabled"){
-        //     bloom.uniforms.glowOnly = false;
-        //     bloom.uniforms.contrast = 128;
-        //     bloom.uniforms.brightness = -0.3;
-        //     bloom.uniforms.delta = 1.0;
-        //     bloom.uniforms.sigma = 3.78;
-        //     bloom.uniforms.stepSize = 5.0;
-        // }
-    }
-
-    _update() {
-
     }
 
     destroy() {
         this._eventHandler.destroy();
-        this._removePostRenderEvent();
+        this._viewer.scene.postRender.removeEventListener(this._removePostRenderEvent);
         // this._frustumsSubscription.dispose();
         for (let i = this._subscribes.length - 1; i >= 0; i--) {
             this._subscribes[i].dispose();
@@ -109,19 +97,31 @@ class MapOptionsViewModel {
         return destroyObject(this);
     }
 
-    subscribe(name, obj, prop) {
+    _update() {
+
+    }
+
+    _subscribe(name, obj, prop) {
         const that = this;
         const result = knockout
             .getObservable(that, name)
             .subscribe(() => {
                 obj[prop] = that[name];
-                that._scene.requestRender();
-                if (name === "sceneEnableCollisionDetection"){
+                that._viewer.scene.requestRender();
+                if (name === "sceneEnableCollisionDetection") {
                     obj[prop] = !that[name];
+                } else if (name === "globeTranslucencyEnabled") {
+                    obj.frontFaceAlpha = 0.5;
+                } else if (name === "sceneBloomEnabled") {
+                    obj.uniforms.glowOnly = false;
+                    obj.uniforms.contrast = 128;
+                    obj.uniforms.brightness = -0.3;
+                    obj.uniforms.delta = 1.0;
+                    obj.uniforms.sigma = 3.78;
+                    obj.uniforms.stepSize = 5.0;
                 }
             });
         this._subscribes.push(result);
-        console.log(this.globeShowGroundAtmosphere);
     }
 }
 

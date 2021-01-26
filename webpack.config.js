@@ -50,10 +50,10 @@ const config = {
                 ]
             },
             {
-                test: /\.(png|jpg|jpeg|gif|svg)$/,
+                test: /\.(png|jpg|jpeg|gif|svg|glb)$/,
                 loader: "url-loader",
                 options: {
-                    name: "./Assets/sc/[name].[ext]", // 这个路径其实是为了兼容Cesium的资源文件目录
+                    name: "./Assets/SimpleCesium/[name].[ext]", // 这个路径其实是为了兼容Cesium的资源文件目录
                     limit: 10240 // 超过10K的不转换base64
                 }
             }
@@ -102,7 +102,8 @@ const config = {
                 {from: path.join(cesiumSource, "../Build/Cesium/Workers"), to: "Workers"},
                 {from: path.join(cesiumSource, "../Build/Cesium/Assets"), to: "Assets"},
                 {from: path.join(cesiumSource, "../Build/Cesium/Widgets"), to: "Widgets"},
-                {from: path.join(cesiumSource, "../Build/Cesium/ThirdParty"), to: "ThirdParty"}
+                {from: path.join(cesiumSource, "../Build/Cesium/ThirdParty"), to: "ThirdParty"},
+                // {from: "src/Assets", to: "Assets/SimpleCesium"},
             ]
         }), // 拷贝Cesium资源、控件、WebWorker到静态目录。
     ],

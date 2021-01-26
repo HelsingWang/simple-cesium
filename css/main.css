@@ -15,6 +15,7 @@ body {
     overflow: hidden;
 }
 
+/* Cesium Style*/
 .cesiumContainer {
     width: 100%;
     height: 100%;
@@ -22,65 +23,40 @@ body {
     padding: 0;
     overflow: hidden;
 }
-.cesiumSlider {
-    display: none;
-    position: absolute;
-    left: 50%;
-    top: 0;
-    background-color: rgba(210, 255, 255, .5);
-    width: 4px;
-    height: 100%;
-    z-index: 1;
-}
-.cesiumSlider:hover {
-    cursor: ew-resize;
-}
 .creditContainer {
     display: none;
 }
-.cesiumCoordInfo {
-    padding-left: 5px;
-    width: 100%;
-    position: absolute;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.1);
-    color: white;
-}
 
-.threeContainer {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
+/* SimpleCesium Style */
+.simpleCesium {
     width: 100%;
+    height: 100%;
     margin: 0;
     padding: 0;
     overflow: hidden;
-    pointer-events: none;
-    z-index: 1;
 }
-.threeCanvas {
-    display: none;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    left: 0;
-    top: 0;
-    pointer-events: none;
-}
-
-.sc-widget-container {
+.simpleCesium .sc-widgets {
     position: absolute;
     top: 50px;
     left: 10px;
-    width: 200px;
-    /*height: 400px;*/
-    padding: 2px;
-    background: rgba(0, 0, 0, .5);
-    border-radius: 5px;
-    border: 1px solid #444;
+    width: calc(100% - 100px);
+    height: calc(100% - 80px);
+    z-index: 1;
+    pointer-events: none;
 }
-.sc-widget {
+.simpleCesium .sc-widget-container {
+    display: inline-block;
+    vertical-align: top;
+    width: 200px;
+    padding: 2px;
+    margin: 1px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 5px;
+    border: 1px solid #444444;
+    pointer-events: auto;
+    box-shadow: 0 0 8px 0 rgba(225, 225, 225, 0.6) inset;
+}
+.simpleCesium .sc-widget {
     width: 100%;
     height: 100%;
     transition: width ease-in-out 0.25s;
@@ -92,25 +68,60 @@ body {
     user-select: none;
     overflow: hidden;
 }
-.sc-widget .sc-widget-title {
+.simpleCesium .sc-widget .sc-widget-title {
     height: 20px;
     border-bottom: 2px solid #eeeeee;
+    font-size: small;
 }
-.sc-widget .sc-widget-title .sc-widget-bar {
+.simpleCesium .sc-widget .sc-widget-title .sc-widget-bar {
     position: absolute;
     top: 2px;
     right: 2px;
 }
-.sc-widget .sc-widget-bar span {
+.simpleCesium .sc-widget .sc-widget-bar span {
     cursor: pointer;
     min-width: 16px;
     padding: 0 2px;
 }
-.sc-widget .sc-widget-bar span:hover {
+.simpleCesium .sc-widget .sc-widget-bar span:hover {
     box-shadow: 0 0 8px rgb(255, 255, 255);
 }
-.sc-widget .sc-widget-content {
+.simpleCesium .sc-widget .sc-widget-content {
     padding: 5px;
     width: calc(100% - 10px);
     height: calc(100% - 20px);
+}
+.simpleCesium .sc-widget .sc-widget-group span:after {
+    content: '';
+    width: 60%;
+    position: absolute;
+    border-top: 1px solid #c8c8c8;
+    margin: 8px 4px;
+}
+.simpleCesium .sc-widget .sc-widget-item {
+    display: flex;
+    align-items: center;
+    height: 25px;
+    margin: 0 0 0 5px;
+}
+.simpleCesium .sc-widget .sc-widget-item span {
+    white-space: nowrap;
+}
+.simpleCesium .sc-widget .sc-widget-item input {
+    padding: 0;
+}
+.simpleCesium .sc-widget .sc-widget-item input[type='range'] {
+    flex: 1;
+    width: 100%;
+}
+.simpleCesium .sc-widget .sc-widget-item input[type='text'] {
+    /*width: 100%;*/
+    background: rgba(0, 0, 0, .2);
+    color: inherit;
+}
+.simpleCesium .sc-widget .sc-widget-item button {
+    background-color: rgba(0, 0, 0, .2);
+    color: inherit;
+    font-size: inherit;
+    cursor: pointer;
 }

@@ -24,7 +24,8 @@ function viewerMapOptionsMixin(viewer, options = {}) {
 
     const container = document.createElement("div");
     container.className = "sc-widget-container";
-    viewer.container.appendChild(container);
+    const parent = viewer.scWidgetsContainer || viewer.container;
+    parent.appendChild(container);
     const widget = new MapOptions(
         viewer, {container: container}
     );
@@ -32,14 +33,14 @@ function viewerMapOptionsMixin(viewer, options = {}) {
     // Remove the mapOptions property from viewer.
     widget.addOnDestroyListener((function (viewer) {
         return function () {
-            defined(container) && viewer.container.removeChild(container);
-            delete viewer.mapOptions;
+            defined(container) && container.parentNode.removeChild(container);
+            delete viewer.scMapOptions;
         }
     })(viewer))
 
     // Add the mapOptions property to viewer.
     Object.defineProperties(viewer, {
-        mapOptions: {
+        scMapOptions: {
             get: function () {
                 return widget;
             },

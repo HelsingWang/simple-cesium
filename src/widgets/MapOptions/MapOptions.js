@@ -2,7 +2,7 @@ import defined from "cesium/Source/Core/defined.js";
 import DeveloperError from "cesium/Source/Core/DeveloperError.js";
 import destroyObject from "cesium/Source/Core/destroyObject.js";
 import knockout from "cesium/Source/ThirdParty/knockout.js";
-import {getElement,insertHtml} from "../../common/util.js";
+import {bindEvent,getElement,insertHtml} from "../../common/util.js";
 import MapOptionsViewModel from "./MapOptionsViewModel.js";
 import MapOptionsHtml from "./MapOptions.html";
 
@@ -43,17 +43,16 @@ class MapOptions {
         typeof options === "string" && (container = options);
         container = getElement(container);
         const element = document.createElement("div");
-        element.className = "sc-widget";
+        element.className = "sc-widget sc-widget-mapOptions";
         insertHtml(element, {
             content: MapOptionsHtml, delay:1000, callback: () => {
-                const close = getElement(".sc-widget-bar-close");
-                close && close.addEventListener("click", () => {
+                bindEvent(".sc-widget-mapOptions .sc-widget-bar-close", "click", function () {
                     that.destroy();
-                }, false);
+                })
             }
         });
         container.appendChild(element);
-        const viewModel = new MapOptionsViewModel(viewer, element);
+        const viewModel = new MapOptionsViewModel(viewer);
 
         this._viewModel = viewModel;
         this._element = element;
