@@ -5,9 +5,9 @@ import CesiumViewer from "cesium/Source/Widgets/Viewer/Viewer.js";
 import createOsmBuildings from "cesium/Source/Scene/createOsmBuildings.js";
 import Ion from "cesium/Source/Core/Ion.js";
 import viewerCesiumNavigationMixin from "cesium-navigation-es6/viewerCesiumNavigationMixin.js";
-import viewerLayerControlMixin from "../widgets/LayerControl/viewerLayerControlMixin.js";
+// import viewerLayerControlMixin from "../widgets/LayerControl/viewerLayerControlMixin.js";
 import viewerMapOptionsMixin from "../widgets/MapOptions/viewerMapOptionsMixin.js";
-import viewerModelBuilderMixin from "../widgets/ModelBuilder/viewerModelBuilderMixin.js";
+// import viewerModelBuilderMixin from "../widgets/ModelBuilder/viewerModelBuilderMixin.js";
 import {insertHtml,getElement} from "../common/util.js";
 import ViewerHtml from "./Viewer.html";
 
@@ -64,9 +64,9 @@ class Viewer {
 
             // 添加插件
             viewer.extend(viewerCesiumNavigationMixin, {});
-            viewer.extend(viewerLayerControlMixin);
+            // viewer.extend(viewerLayerControlMixin);
             viewer.extend(viewerMapOptionsMixin);
-            viewer.extend(viewerModelBuilderMixin);
+            // viewer.extend(viewerModelBuilderMixin);
 
             this._cesiumViewer = viewer;
         })
