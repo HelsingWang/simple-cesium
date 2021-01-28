@@ -1,0 +1,14 @@
+.simpleCesium .sc-widget-layerControl .sc-widget-group button {
+    position: absolute;
+    right: 5px;
+}
+.simpleCesium .sc-widget-layerControl .sc-widget-item label{
+    text-overflow: ellipsis;
+    overflow: hidden;
+    min-width: 120px;
+    /*max-width: 100px;*/
+}
+.simpleCesium .sc-widget-layerControl .sc-widget-tree dd {
+    max-height: 150px;
+    overflow: auto;
+}

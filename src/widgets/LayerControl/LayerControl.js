@@ -3,14 +3,14 @@ import DeveloperError from "cesium/Source/Core/DeveloperError.js";
 import destroyObject from "cesium/Source/Core/destroyObject.js";
 import knockout from "cesium/Source/ThirdParty/knockout.js";
 import {bindEvent,getElement,insertHtml} from "../../common/util.js";
-import MapOptionsViewModel from "./MapOptionsViewModel.js";
-import MapOptionsHtml from "./MapOptions.html";
+import LayerControlViewModel from "./LayerControlViewModel.js";
+import LayerControlHtml from "./LayerControl.html";
 
-class MapOptions {
+class LayerControl {
 
     /**
      * Gets the parent container.
-     * @memberOf MapOptions.prototype
+     * @memberOf LayerControl.prototype
      * @type {Element}
      */
     get container() {
@@ -18,8 +18,8 @@ class MapOptions {
     }
     /**
      * Gets the view model.
-     * @memberOf MapOptions.prototype
-     * @type {MapOptionsViewModel}
+     * @memberOf LayerControl.prototype
+     * @type {LayerControlViewModel}
      */
     get viewModel() {
         return this._viewModel;
@@ -43,16 +43,28 @@ class MapOptions {
         typeof options === "string" && (container = options);
         container = getElement(container);
         const element = document.createElement("div");
-        element.className = "sc-widget sc-widget-mapOptions";
+        element.className = "sc-widget sc-widget-layerControl";
         insertHtml(element, {
-            content: MapOptionsHtml, delay:1000, callback: () => {
-                bindEvent(".sc-widget-mapOptions .sc-widget-bar-close", "click", function () {
+            content: LayerControlHtml, delay:1000, callback: () => {
+                bindEvent(".sc-widget-layerControl .sc-widget-bar-close", "click", function () {
                     that.destroy();
+                })
+                bindEvent(".sc-widget-layerControl .sc-widget-updatePrimitiveLayers", "click", function () {
+                    that._viewModel._updatePrimitiveLayers();
+                })
+                bindEvent(".sc-widget-layerControl .sc-widget-updateEntityLayers", "click", function () {
+                    that._viewModel._updateEntityLayers();
+                })
+                bindEvent(".sc-widget-layerControl .sc-widget-updateImageryLayers", "click", function () {
+                    that._viewModel._updateImageryLayers();
+                })
+                bindEvent(".sc-widget-layerControl .sc-widget-updateTerrainLayers", "click", function () {
+                    that._viewModel._updateTerrainLayers();
                 })
             }
         });
         container.appendChild(element);
-        const viewModel = new MapOptionsViewModel(viewer);
+        const viewModel = new LayerControlViewModel(viewer, element);
 
         this._viewModel = viewModel;
         this._element = element;
@@ -98,4 +110,4 @@ class MapOptions {
     }
 }
 
-export default MapOptions;
+export default LayerControl;

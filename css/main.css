@@ -68,6 +68,27 @@ body {
     user-select: none;
     overflow: hidden;
 }
+.simpleCesium .sc-widget input {
+    vertical-align: middle;
+    background: rgba(0, 0, 0, .2);
+    color: inherit;
+}
+.simpleCesium .sc-widget input[type=text]:hover {
+    box-shadow: 0 0 8px 0 rgba(225, 225, 225, 0.4) inset;
+}
+.simpleCesium .sc-widget input[type=checkbox]:hover {
+    box-shadow: 0 0 8px rgb(255, 255, 255);
+}
+.simpleCesium .sc-widget button {
+    vertical-align: middle;
+    background: rgba(0, 0, 0, .2);
+    color: inherit;
+    cursor: pointer;
+    font-size: inherit;
+}
+.simpleCesium .sc-widget button:hover {
+    box-shadow: 0 0 8px rgb(255, 255, 255);
+}
 .simpleCesium .sc-widget .sc-widget-title {
     height: 20px;
     border-bottom: 2px solid #eeeeee;
@@ -91,6 +112,12 @@ body {
     width: calc(100% - 10px);
     height: calc(100% - 20px);
 }
+.simpleCesium .sc-widget .sc-widget-group {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    height: 24px;
+}
 .simpleCesium .sc-widget .sc-widget-group span:after {
     content: '';
     width: 60%;
@@ -98,11 +125,12 @@ body {
     border-top: 1px solid #c8c8c8;
     margin: 8px 4px;
 }
-.simpleCesium .sc-widget .sc-widget-item {
+.simpleCesium .sc-widget .sc-widget-item{
     display: flex;
     align-items: center;
     height: 25px;
-    margin: 0 0 0 5px;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 .simpleCesium .sc-widget .sc-widget-item span {
     white-space: nowrap;
@@ -110,18 +138,30 @@ body {
 .simpleCesium .sc-widget .sc-widget-item input {
     padding: 0;
 }
-.simpleCesium .sc-widget .sc-widget-item input[type='range'] {
-    flex: 1;
+.simpleCesium .sc-widget .sc-widget-item input[type=checkbox] {
+    margin-left: 2px;
+}
+.simpleCesium .sc-widget .sc-widget-item input[type=range] {
     width: 100%;
+    /*min-width: 76px;*/
 }
-.simpleCesium .sc-widget .sc-widget-item input[type='text'] {
-    /*width: 100%;*/
-    background: rgba(0, 0, 0, .2);
-    color: inherit;
+.simpleCesium .sc-widget .sc-widget-tree {
+    padding: 0;
+    margin: 0;
 }
-.simpleCesium .sc-widget .sc-widget-item button {
-    background-color: rgba(0, 0, 0, .2);
-    color: inherit;
-    font-size: inherit;
-    cursor: pointer;
+.simpleCesium .sc-widget .sc-widget-tree dl {
+    padding: 0;
+    margin: 0;
+}
+.simpleCesium .sc-widget .sc-widget-tree dd {
+    margin-left: 10px;
+}
+.simpleCesium .sc-widget .sc-widget-tree .sc-widget-item {
+    white-space: nowrap;
+}
+.simpleCesium .sc-widget .sc-widget-treeNode {
+
+}
+.simpleCesium .sc-widget .sc-widget-treeNode:hover {
+    box-shadow: 0 0 8px 0 rgba(225, 225, 225, 0.6) inset;
 }

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LayerControl</title>
+</head>
+<body>
+<div class="sc-widget-title">图层管理
+    <div class="sc-widget-bar"><span class="sc-widget-bar-close">×</span></div>
+</div>
+<div class="sc-widget-content">
+    <ul class="sc-widget-tree">
+        <li>
+            <div class="sc-widget-group"><span>图元</span>
+                <button class="sc-widget-updatePrimitiveLayers">刷新</button>
+            </div>
+            <dl>
+                <dd data-bind="foreach: primitiveLayers">
+                    <div class="sc-widget-treeNode sc-widget-item">
+                        <label><input type="checkbox" data-bind="checked: show"><span
+                                data-bind="text: name, attr: {title: name}"></span></label>
+                        <input type="range" min="0" max="1" step="0.01" data-bind="valueUpdate: 'input'">
+                    </div>
+                </dd>
+            </dl>
+        </li>
+        <li>
+            <div class="sc-widget-group"><span>实体</span>
+                <button class="sc-widget-updateEntityLayers">刷新</button>
+            </div>
+            <dl>
+                <dd data-bind="foreach: entityLayers">
+                    <div class="sc-widget-treeNode sc-widget-item">
+                        <label><input type="checkbox" data-bind="checked: show"><span
+                                data-bind="text: name, attr: {title: name}"></span></label>
+                        <input type="range" min="0" max="1" step="0.01" data-bind="valueUpdate: 'input'">
+                    </div>
+                </dd>
+            </dl>
+        </li>
+        <li>
+            <div class="sc-widget-group"><span>影像</span>
+                <button class="sc-widget-updateImageryLayers">刷新</button>
+            </div>
+            <dl>
+                <dd data-bind="foreach: imageryLayers">
+                    <div class="sc-widget-treeNode sc-widget-item">
+                        <label><input type="checkbox" data-bind="checked: show"><span
+                                data-bind="text: name, attr: {title: name}"></span></label>
+                        <input type="range" min="0" max="1" step="0.01" data-bind="value: alpha, valueUpdate: 'input'">
+                    </div>
+                </dd>
+            </dl>
+        </li>
+        <li>
+            <div class="sc-widget-group"><span>地形</span>
+                <button class="sc-widget-updateTerrainLayers">刷新</button>
+            </div>
+            <dl>
+                <dd data-bind="foreach: terrainLayers">
+                    <div class="sc-widget-treeNode sc-widget-item">
+                        <label><input type="checkbox" data-bind="checked: show"><span
+                                data-bind="text: name, attr: {title: name}"></span></label>
+                        <input type="range" min="0" max="1" step="0.01" data-bind="valueUpdate: 'input'">
+                    </div>
+                </dd>
+            </dl>
+        </li>
+    </ul>
+</div>
+</body>
+</html>
