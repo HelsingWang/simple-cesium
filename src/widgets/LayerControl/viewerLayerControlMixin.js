@@ -1,7 +1,9 @@
-import defined from "cesium/Source/Core/defined.js";
-import DeveloperError from "cesium/Source/Core/DeveloperError.js";
-import LayerControl from "./LayerControl.js";
-import "./LayerControl.css"
+import {
+    defined,
+    DeveloperError
+} from 'cesium';
+import {LayerControl} from './LayerControl';
+import './LayerControl.css';
 
 /**
  * A mixin which adds the LayerControl widget to the Viewer widget.
@@ -17,13 +19,13 @@ import "./LayerControl.css"
  * var viewer = new Cesium.Viewer('cesiumContainer');
  * viewer.extend(viewerLayerControlMixin);
  */
-function viewerLayerControlMixin(viewer, options = {}) {
+export function viewerLayerControlMixin(viewer, options = {}) {
     if (!defined(viewer)) {
-        throw new DeveloperError("viewer is required.");
+        throw new DeveloperError('viewer is required.');
     }
 
-    const container = document.createElement("div");
-    container.className = "sc-widget-container";
+    const container = document.createElement('div');
+    container.className = 'sc-widget-container';
     const parent = viewer.scWidgetsContainer || viewer.container;
     parent.appendChild(container);
     const widget = new LayerControl(
@@ -35,8 +37,8 @@ function viewerLayerControlMixin(viewer, options = {}) {
         return function () {
             defined(container) && container.parentNode.removeChild(container);
             delete viewer.scLayerControl;
-        }
-    })(viewer))
+        };
+    })(viewer));
 
     // Add the layerControl property to viewer.
     Object.defineProperties(viewer, {
@@ -45,8 +47,6 @@ function viewerLayerControlMixin(viewer, options = {}) {
                 return widget;
             },
             configurable: true
-        },
+        }
     });
 }
-
-export default viewerLayerControlMixin;

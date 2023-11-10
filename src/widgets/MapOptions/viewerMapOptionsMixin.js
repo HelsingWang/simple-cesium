@@ -1,7 +1,9 @@
-import defined from "cesium/Source/Core/defined.js";
-import DeveloperError from "cesium/Source/Core/DeveloperError.js";
-import MapOptions from "./MapOptions.js";
-import "./MapOptions.css"
+import {
+    defined,
+    DeveloperError
+} from 'cesium';
+import {MapOptions} from './MapOptions';
+import './MapOptions.css';
 
 /**
  * A mixin which adds the MapOptions widget to the Viewer widget.
@@ -17,13 +19,13 @@ import "./MapOptions.css"
  * var viewer = new Cesium.Viewer('cesiumContainer');
  * viewer.extend(viewerMapOptionsMixin);
  */
-function viewerMapOptionsMixin(viewer, options = {}) {
+export function viewerMapOptionsMixin(viewer, options = {}) {
     if (!defined(viewer)) {
-        throw new DeveloperError("viewer is required.");
+        throw new DeveloperError('viewer is required.');
     }
 
-    const container = document.createElement("div");
-    container.className = "sc-widget-container";
+    const container = document.createElement('div');
+    container.className = 'sc-widget-container';
     const parent = viewer.scWidgetsContainer || viewer.container;
     parent.appendChild(container);
     const widget = new MapOptions(
@@ -35,8 +37,8 @@ function viewerMapOptionsMixin(viewer, options = {}) {
         return function () {
             defined(container) && container.parentNode.removeChild(container);
             delete viewer.scMapOptions;
-        }
-    })(viewer))
+        };
+    })(viewer));
 
     // Add the mapOptions property to viewer.
     Object.defineProperties(viewer, {
@@ -45,8 +47,6 @@ function viewerMapOptionsMixin(viewer, options = {}) {
                 return widget;
             },
             configurable: true
-        },
+        }
     });
 }
-
-export default viewerMapOptionsMixin;

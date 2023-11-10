@@ -1,8 +1,10 @@
-import "/css/main.css";
-import Viewer from "./core/Viewer.js";
+import '/css/main.css';
+import {ScMap} from './core/ScMap';
 
 // Just for test
-new Viewer();
+new ScMap();
 
 export var VERSION = '1.0';
-export {default as Viewer} from "./core/Viewer.js"
+console.log('SimpleCesium V' + VERSION);
+
+export {ScMap, ScMap as ScViewer} from './core/ScMap';

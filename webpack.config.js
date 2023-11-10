@@ -1,5 +1,3 @@
-// webpack.config.js
-
 const cesiumSource = 'node_modules/cesium/Source'; // Cesium源码路径。
 const onePackage = false; // 是否打包成一个文件。
 const nodeEnv = process.env.NODE_ENV; // 编译模式。
@@ -9,6 +7,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin'); // HTML插件。
 const CopyWebpackPlugin = require('copy-webpack-plugin'); // 拷贝文件插件。
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin; // Bundle分析插件。
 const {CleanWebpackPlugin} = require("clean-webpack-plugin");
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin')
 
 const config = {
     mode: nodeEnv, // 编译模式："production" | "development" | "none"。
@@ -60,6 +59,8 @@ const config = {
         ]
     },
     plugins: [
+        // 引入 polyfill
+        new NodePolyfillPlugin(),
         new CleanWebpackPlugin(),
         // new BundleAnalyzerPlugin(),
         new webpack.DefinePlugin({
@@ -111,7 +112,7 @@ const config = {
         splitChunks: onePackage ? {} : {
             chunks: "initial", // 从哪些chunks里面抽取代码，还可以通过函数来过滤所需的chunks："initial" | "async" | "all" | function。
             minSize: 30000, // 抽取出来的文件在压缩前的最小大小，默认为30000。
-            maxSize: 0, // 抽取出来的文件在压缩前的最大大小，默认为0，表示不限制最大大小。
+            maxSize: 100000, // 抽取出来的文件在压缩前的最大大小，默认为0，表示不限制最大大小。
             minChunks: 1, // 被引用次数，默认为1。如common中minChunks为2，表示将被两次以上引用的代码抽离成common。
             maxAsyncRequests: 6, // 按需加载chunk的并发请求数量，默认为5。
             maxInitialRequests: 4, // 页面初始加载时的并发请求数量，默认为3。

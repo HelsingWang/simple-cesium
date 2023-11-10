@@ -1,4 +1,4 @@
-import * as Cesium from "/node_modules/cesium/Source/Cesium.js";
+import * as Cesium from "cesium";
 
 console.log(Cesium.VERSION);
 new Cesium.Viewer("cesiumContainer");

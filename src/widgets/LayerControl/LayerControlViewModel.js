@@ -1,20 +1,22 @@
-import defined from "cesium/Source/Core/defined.js";
-import defaultValue from "cesium/Source/Core/defaultValue.js";
-import destroyObject from "cesium/Source/Core/destroyObject.js";
-import DeveloperError from "cesium/Source/Core/DeveloperError.js";
-import EventHelper from "cesium/Source/Core/EventHelper.js";
-import Model from "cesium/Source/Scene/Model.js";
-import PrimitiveCollection from "cesium/Source/Scene/PrimitiveCollection.js";
-import ScreenSpaceEventHandler from "cesium/Source/Core/ScreenSpaceEventHandler.js";
-import CesiumTerrainProvider from "cesium/Source/Core/CesiumTerrainProvider.js";
-import EllipsoidTerrainProvider from "cesium/Source/Core/EllipsoidTerrainProvider.js";
-import IonResource from "cesium/Source/Core/IonResource.js";
-import knockout from "cesium/Source/ThirdParty/knockout.js";
+import {
+    defined,
+    defaultValue,
+    destroyObject,
+    DeveloperError,
+    EventHelper,
+    Model,
+    PrimitiveCollection,
+    ScreenSpaceEventHandler,
+    CesiumTerrainProvider,
+    EllipsoidTerrainProvider,
+    IonResource
+} from 'cesium';
+import knockout from '/node_modules/@cesium/widgets/Source/ThirdParty/knockout';
 
-class LayerControlViewModel {
+export class LayerControlViewModel {
     constructor(viewer) {
         if (!defined(viewer)) {
-            throw new DeveloperError("viewer is required");
+            throw new DeveloperError('viewer is required');
         }
 
         const that = this;
@@ -35,11 +37,11 @@ class LayerControlViewModel {
 
 
         Object.assign(this, {
-            "viewerShadows": defaultValue(viewer.shadows, false),
-        })
+            'viewerShadows': defaultValue(viewer.shadows, false)
+        });
         knockout.track(this);
         const props = [
-            ["viewerShadows", viewer, "shadows"]
+            ['viewerShadows', viewer, 'shadows']
         ];
         props.forEach(value => this._subscribe(value[0], value[1], value[2]));
 
@@ -88,7 +90,7 @@ class LayerControlViewModel {
             const layer = layers.get(i);
             if (!layer.name) {
                 if (layer.isCesium3DTileset) {
-                    layer.url && (layer.name = layer.url.substring(0, layer.url.lastIndexOf("/"))
+                    layer.url && (layer.name = layer.url.substring(0, layer.url.lastIndexOf('/'))
                         .replace(/^(.*[\/\\])?(.*)*$/, '$2'));
                 } else if (layer instanceof Model) {
                     layer._resource && (layer.name = layer._resource.url.replace(/^(.*[\/\\])?(.*)*(\.[^.?]*.*)$/, '$2'));
@@ -96,9 +98,9 @@ class LayerControlViewModel {
                     layer.name = `PrimitiveCollection_${layer._guid}`;
                 }
             }
-            !layer.name && (layer.name = "[未命名]");
+            !layer.name && (layer.name = '[未命名]');
             this.primitiveLayers.push(layer);
-            knockout.track(layer, ["show", "name"]);
+            knockout.track(layer, ['show', 'name']);
         }
     }
 
@@ -108,10 +110,10 @@ class LayerControlViewModel {
         this.entityLayers.splice(0, this.entityLayers.length);
         for (let i = count - 1; i >= 0; --i) {
             const layer = layers[i];
-            !layer.name && (layer.name = "[未命名]");
-            layer.name = layer.name.replace(/^(.*[\/\\])?(.*)*(\.[^.?]*.*)$/, '$2')
+            !layer.name && (layer.name = '[未命名]');
+            layer.name = layer.name.replace(/^(.*[\/\\])?(.*)*(\.[^.?]*.*)$/, '$2');
             this.entityLayers.push(layer);
-            knockout.track(layer, ["show", "name"]);
+            knockout.track(layer, ['show', 'name']);
         }
     }
 
@@ -124,9 +126,9 @@ class LayerControlViewModel {
             if (!layer.name) {
                 layer.name = layer.imageryProvider._resource.url;
             }
-            !layer.name && (layer.name = "[未命名]");
+            !layer.name && (layer.name = '[未命名]');
             this.imageryLayers.push(layer);
-            knockout.track(layer, ["alpha", "show", "name"]);
+            knockout.track(layer, ['alpha', 'show', 'name']);
         }
     }
 
@@ -140,7 +142,7 @@ class LayerControlViewModel {
         if (!layer.name && realShow) {
             layer.name = realLayers[0].resource._url + realLayers[0].tileUrlTemplates;
         }
-        !layer.name && (layer.name = "[默认地形]");
+        !layer.name && (layer.name = '[默认地形]');
         // 定义show属性
         !defined(layer.show) && Object.defineProperties(layer, {
             show: {
@@ -148,7 +150,7 @@ class LayerControlViewModel {
                     return realShow;
                 },
                 configurable: true
-            },
+            }
         });
 
         if (realShow !== layer.show) {
@@ -167,9 +169,7 @@ class LayerControlViewModel {
         }
 
         this.terrainLayers.push(layer);
-        knockout.track(layer, ["alpha", "show", "name"]);
+        knockout.track(layer, ['alpha', 'show', 'name']);
 
     }
 }
-
-export default LayerControlViewModel;

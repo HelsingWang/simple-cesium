@@ -1,12 +1,14 @@
-import defined from "cesium/Source/Core/defined.js";
-import DeveloperError from "cesium/Source/Core/DeveloperError.js";
-import destroyObject from "cesium/Source/Core/destroyObject.js";
-import knockout from "cesium/Source/ThirdParty/knockout.js";
-import {bindEvent,getElement,insertHtml} from "../../common/util.js";
-import MapOptionsViewModel from "./MapOptionsViewModel.js";
-import MapOptionsHtml from "./MapOptions.html";
+import {
+    defined,
+    DeveloperError,
+    destroyObject
+} from 'cesium';
+import knockout from '/node_modules/@cesium/widgets/Source/ThirdParty/knockout';
+import {Util} from '../../common/Util';
+import {MapOptionsViewModel} from './MapOptionsViewModel';
+import MapOptionsHtml from './MapOptions.html';
 
-class MapOptions {
+export class MapOptions {
 
     /**
      * Gets the parent container.
@@ -16,6 +18,7 @@ class MapOptions {
     get container() {
         return this._container;
     }
+
     /**
      * Gets the view model.
      * @memberOf MapOptions.prototype
@@ -25,30 +28,30 @@ class MapOptions {
         return this._viewModel;
     }
 
-    constructor(viewer, options={}) {
+    constructor(viewer, options = {}) {
         this._element = undefined;
-        this._container= undefined;
-        this._viewModel= undefined;
-        this._onDestroyListeners= [];
+        this._container = undefined;
+        this._viewModel = undefined;
+        this._onDestroyListeners = [];
 
         if (!defined(viewer)) {
-            throw new DeveloperError("viewer is required.");
+            throw new DeveloperError('viewer is required.');
         }
         if (!defined(options)) {
-            throw new DeveloperError("container is required.");
+            throw new DeveloperError('container is required.');
         }
 
         const that = this;
         let container = options.container;
-        typeof options === "string" && (container = options);
-        container = getElement(container);
-        const element = document.createElement("div");
-        element.className = "sc-widget sc-widget-mapOptions";
-        insertHtml(element, {
-            content: MapOptionsHtml, delay:1000, callback: () => {
-                bindEvent(".sc-widget-mapOptions .sc-widget-bar-close", "click", function () {
+        typeof options === 'string' && (container = options);
+        container = Util.getElement(container);
+        const element = document.createElement('div');
+        element.className = 'sc-widget sc-widget-mapOptions';
+        Util.insertHtml(element, {
+            content: MapOptionsHtml, delay: 1000, callback: () => {
+                Util.bindEvent('.sc-widget-mapOptions .sc-widget-bar-close', 'click', function () {
                     that.destroy();
-                })
+                });
             }
         });
         container.appendChild(element);
@@ -65,7 +68,7 @@ class MapOptions {
     /**
      * @returns {Boolean} true if the object has been destroyed, false otherwise.
      */
-    isDestroyed () {
+    isDestroyed() {
         return false;
     }
 
@@ -73,7 +76,7 @@ class MapOptions {
      * Destroys the widget. Should be called if permanently.
      * removing the widget from layout.
      */
-    destroy () {
+    destroy() {
         if (defined(this._element)) {
             knockout.cleanNode(this._element);
             defined(this._container) && this._container.removeChild(this._element);
@@ -93,9 +96,7 @@ class MapOptions {
 
     addOnDestroyListener(callback) {
         if (typeof callback === 'function') {
-            this._onDestroyListeners.push(callback)
+            this._onDestroyListeners.push(callback);
         }
     }
 }
-
-export default MapOptions;

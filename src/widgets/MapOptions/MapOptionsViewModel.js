@@ -1,14 +1,16 @@
-import defined from "cesium/Source/Core/defined.js";
-import defaultValue from "cesium/Source/Core/defaultValue.js";
-import destroyObject from "cesium/Source/Core/destroyObject.js";
-import DeveloperError from "cesium/Source/Core/DeveloperError.js";
-import ScreenSpaceEventHandler from "cesium/Source/Core/ScreenSpaceEventHandler.js";
-import knockout from "cesium/Source/ThirdParty/knockout.js";
+import {
+    defined,
+    defaultValue,
+    destroyObject,
+    DeveloperError,
+    ScreenSpaceEventHandler
+} from 'cesium';
+import knockout from '/node_modules/@cesium/widgets/Source/ThirdParty/knockout';
 
-class MapOptionsViewModel {
+export class MapOptionsViewModel {
     constructor(viewer) {
         if (!defined(viewer)) {
-            throw new DeveloperError("viewer is required");
+            throw new DeveloperError('viewer is required');
         }
 
         const that = this;
@@ -25,22 +27,22 @@ class MapOptionsViewModel {
         this._subscribes = [];
 
         Object.assign(this, {
-            "viewerShadows": defaultValue(viewer.shadows, false),
-            "globeEnableLighting": defaultValue(globe.enableLighting, false),
-            "globeShowGroundAtmosphere": defaultValue(globe.showGroundAtmosphere, true),
-            "globeTranslucencyEnabled": defaultValue(globe.translucency.enabled, false),
-            "globeShow": defaultValue(globe.show, true),
-            "globeDepthTestAgainstTerrain": defaultValue(globe.depthTestAgainstTerrain, false),
-            "globeWireFrame": defaultValue(globe._surface.tileProvider._debug.wireFrame, false),
-            "sceneSkyAtmosphereShow": defaultValue(scene.skyAtmosphere.show, true),
-            "sceneFogEnabled": defaultValue(scene.fog.enabled, true),
-            "sceneRequestRenderMode": defaultValue(scene.requestRenderMode, false),
-            "sceneLogarithmicDepthBuffer": defaultValue(scene.logarithmicDepthBuffer, false),
-            "sceneDebugShowFramesPerSecond": defaultValue(scene.debugShowFramesPerSecond, false),
-            "sceneDebugShowFrustumPlanes": defaultValue(scene.debugShowFrustumPlanes, false),
-            "sceneEnableCollisionDetection": defaultValue(scene.enableCollisionDetection, false),
-            "sceneBloomEnabled": defaultValue(scene.postProcessStages.bloom.enabled, false),
-        })
+            'viewerShadows': defaultValue(viewer.shadows, false),
+            'globeEnableLighting': defaultValue(globe.enableLighting, false),
+            'globeShowGroundAtmosphere': defaultValue(globe.showGroundAtmosphere, true),
+            'globeTranslucencyEnabled': defaultValue(globe.translucency.enabled, false),
+            'globeShow': defaultValue(globe.show, true),
+            'globeDepthTestAgainstTerrain': defaultValue(globe.depthTestAgainstTerrain, false),
+            'globeWireFrame': defaultValue(globe._surface.tileProvider._debug.wireFrame, false),
+            'sceneSkyAtmosphereShow': defaultValue(scene.skyAtmosphere.show, true),
+            'sceneFogEnabled': defaultValue(scene.fog.enabled, true),
+            'sceneRequestRenderMode': defaultValue(scene.requestRenderMode, false),
+            'sceneLogarithmicDepthBuffer': defaultValue(scene.logarithmicDepthBuffer, false),
+            'sceneDebugShowFramesPerSecond': defaultValue(scene.debugShowFramesPerSecond, false),
+            'sceneDebugShowFrustumPlanes': defaultValue(scene.debugShowFrustumPlanes, false),
+            'sceneEnableCollisionDetection': defaultValue(scene.enableCollisionDetection, false),
+            'sceneBloomEnabled': defaultValue(scene.postProcessStages.bloom.enabled, false)
+        });
         knockout.track(this);
         /*knockout.track(this, [
             "viewerShadows",
@@ -60,21 +62,21 @@ class MapOptionsViewModel {
             "sceneBloomEnabled"
         ]);*/
         const props = [
-            ["viewerShadows", viewer, "shadows"],
-            ["globeEnableLighting", globe, "enableLighting"],
-            ["globeShowGroundAtmosphere", globe, "showGroundAtmosphere"],
-            ["globeTranslucencyEnabled", globe.translucency, "enabled"],
-            ["globeShow", globe, "show"],
-            ["globeDepthTestAgainstTerrain", globe, "depthTestAgainstTerrain"],
-            ["globeWireFrame", globe._surface.tileProvider._debug, "wireframe"],
-            ["sceneSkyAtmosphereShow", scene.skyAtmosphere, "show"],
-            ["sceneFogEnabled", scene.fog, "enabled"],
-            ["sceneRequestRenderMode", scene, "requestRenderMode"],
-            ["sceneLogarithmicDepthBuffer", scene, "logarithmicDepthBuffer"],
-            ["sceneDebugShowFramesPerSecond", scene, "debugShowFramesPerSecond"],
-            ["sceneDebugShowFrustumPlanes", scene, "debugShowFrustumPlanes"],
-            ["sceneEnableCollisionDetection", scene.screenSpaceCameraController, "enableCollisionDetection"],
-            ["sceneBloomEnabled", scene.postProcessStages.bloom, "enabled"]
+            ['viewerShadows', viewer, 'shadows'],
+            ['globeEnableLighting', globe, 'enableLighting'],
+            ['globeShowGroundAtmosphere', globe, 'showGroundAtmosphere'],
+            ['globeTranslucencyEnabled', globe.translucency, 'enabled'],
+            ['globeShow', globe, 'show'],
+            ['globeDepthTestAgainstTerrain', globe, 'depthTestAgainstTerrain'],
+            ['globeWireFrame', globe._surface.tileProvider._debug, 'wireframe'],
+            ['sceneSkyAtmosphereShow', scene.skyAtmosphere, 'show'],
+            ['sceneFogEnabled', scene.fog, 'enabled'],
+            ['sceneRequestRenderMode', scene, 'requestRenderMode'],
+            ['sceneLogarithmicDepthBuffer', scene, 'logarithmicDepthBuffer'],
+            ['sceneDebugShowFramesPerSecond', scene, 'debugShowFramesPerSecond'],
+            ['sceneDebugShowFrustumPlanes', scene, 'debugShowFrustumPlanes'],
+            ['sceneEnableCollisionDetection', scene.screenSpaceCameraController, 'enableCollisionDetection'],
+            ['sceneBloomEnabled', scene.postProcessStages.bloom, 'enabled']
         ];
         props.forEach(value => this._subscribe(value[0], value[1], value[2]));
 
@@ -108,11 +110,11 @@ class MapOptionsViewModel {
             .subscribe(() => {
                 obj[prop] = that[name];
                 that._viewer.scene.requestRender();
-                if (name === "sceneEnableCollisionDetection") {
+                if (name === 'sceneEnableCollisionDetection') {
                     obj[prop] = !that[name];
-                } else if (name === "globeTranslucencyEnabled") {
+                } else if (name === 'globeTranslucencyEnabled') {
                     obj.frontFaceAlpha = 0.5;
-                } else if (name === "sceneBloomEnabled") {
+                } else if (name === 'sceneBloomEnabled') {
                     obj.uniforms.glowOnly = false;
                     obj.uniforms.contrast = 128;
                     obj.uniforms.brightness = -0.3;
@@ -124,5 +126,3 @@ class MapOptionsViewModel {
         this._subscribes.push(result);
     }
 }
-
-export default MapOptionsViewModel;
