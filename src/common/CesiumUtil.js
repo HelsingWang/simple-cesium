@@ -12,7 +12,7 @@ import {
     Model,
     ScreenSpaceEventType,
     ScreenSpaceEventHandler,
-    Transforms
+    Transforms, SceneMode, Cartesian2, PrimitiveCollection
 } from 'cesium';
 
 /**
@@ -26,6 +26,7 @@ import {
  * @since 2023/11/10
  */
 export class CesiumUtil {
+    //#region GLTF
     /**
      * 加载GLTF数据。
      *
@@ -41,8 +42,6 @@ export class CesiumUtil {
      * @param {boolean} [layer.zoomTo=false] 是否缩放到图形。
      * @param {string} [layer.id] 图层id。
      * @return {Entity|Primitive}
-     * @author Helsing
-     * @date 2018/11/09
      */
     static loadGltf(viewer, layer) {
         const url = layer.url;
@@ -106,8 +105,6 @@ export class CesiumUtil {
      * 移动GLTF模型。
      *
      * @param {Viewer} viewer Cesium视窗。
-     * @author Helsing
-     * @date 2020/01/24
      */
     static moveGltf(viewer) {
         const handler = new ScreenSpaceEventHandler(viewer.canvas);
@@ -152,8 +149,6 @@ export class CesiumUtil {
      *
      * @param {Viewer} viewer Cesium视窗。
      * @param {function} callback 回调函数。
-     * @author Helsing
-     * @date 2020/01/24
      */
     static selectGltf(viewer, callback) {
         const handler = new ScreenSpaceEventHandler(viewer.canvas);
@@ -174,21 +169,171 @@ export class CesiumUtil {
         }, ScreenSpaceEventType.LEFT_CLICK);
     }
 
+    //#endregion
+
+    //#region Primitive
+
+    /**
+     * 根据字段获取图元。
+     *
+     * @param {PrimitiveCollection} collection 图元集合。
+     * @param {string} fieldValue 字段值。
+     * @param {string} fieldName 字段名称。
+     * @return {Primitive|GroundPrimitive|*} 图元对象
+     */
+    static getPrimitiveByField(collection, fieldValue, fieldName = 'name') {
+        let result;
+        for (let i = 0; i < collection.length; i++) {
+            const primitive = collection.get(i);
+            if (primitive[fieldName] === fieldValue) {
+                result = primitive;
+            } else if (primitive instanceof PrimitiveCollection) {
+                // 如果图元类型为集合，则进行递归。
+                result = this.getPrimitiveByField(primitive, fieldValue, fieldName);
+            }
+            if (result) {
+                break;
+            }
+        }
+        return result;
+    }
+
+    //#endregion
+
+    //#region 动画时间轴
+
+    /**
+     * 开启动画。
+     *
+     * @param {Viewer} viewer 三维视窗
+     */
+    static startAnimation(viewer) {
+        viewer.clock.shouldAnimate = true; // 启动
+    }
+
+    /**
+     * 停止动画。
+     *
+     * @param {Viewer} viewer 三维视窗
+     */
+    static stopAnimation(viewer) {
+        viewer.clock.shouldAnimate = false; // 停止
+    }
+
+    /**
+     * 重置时间轴。
+     *
+     * @param {Viewer} viewer 三维视窗
+     */
+    static resetAnimation(viewer) {
+        viewer.clockViewModel.currentTime = JulianDate.fromDate(new Date());
+    }
+
+    /**
+     * 设置时间轴。
+     *
+     * @param {Viewer} viewer 三维视窗。
+     * @param {JulianDate|Date|string} date 时间。
+     */
+    static setAnimationTime(viewer, date) {
+        let julianDate;
+        if (typeof date === 'string') {
+            julianDate = JulianDate.fromDate(new Date(date));
+        } else {
+            if (date instanceof Date) {
+                julianDate = JulianDate.fromDate(date);
+            } else if (date instanceof JulianDate) {
+                julianDate = date;
+            }
+        }
+        julianDate && (viewer.clockViewModel.currentTime = julianDate);
+    }
+
+    //#endregion
+
     /**
      * 改变坐标点的高度。
      *
-     * @param {Cartesian3} cartesian3 笛卡尔坐标点。
+     * @param {Cartesian3} position 笛卡尔坐标点。
      * @param {number} height 高度。
-     * @param {Ellipsoid} ellipsoid 椭球。
+     * @param {boolean} [add] 是否新增高度，而不是替换。
+     * @param {Ellipsoid} [ellipsoid] 椭球。
      * @return {Cartesian3} 新的坐标点（注意：原坐标点不变）。
-     * @author Helsing
-     * @date 2020/01/19
      */
-    static changeHeight(cartesian3, height, ellipsoid = Ellipsoid.WGS84) {
-        if (defined(cartesian3)) {
-            const oldCartographic = Cartographic.fromCartesian(cartesian3); // 高度调整前的弧度坐标
-            const newCartographic = new Cartographic(oldCartographic.longitude, oldCartographic.latitude, height); // 高度调整后的弧度坐标
+    static changeHeight(position, height, add = false, ellipsoid = Ellipsoid.WGS84) {
+        if (defined(position)) {
+            const oldCartographic = Cartographic.fromCartesian(position); // 高度调整前的弧度坐标
+            const newCartographic = new Cartographic(oldCartographic.longitude, oldCartographic.latitude, add ? oldCartographic.height + height : height); // 高度调整后的弧度坐标
             return ellipsoid.cartographicToCartesian(newCartographic);
         }
+    }
+
+    /**
+     * 切换二三维模式。
+     *
+     * @param {Viewer} viewer Cesium查看器
+     * @param {SceneMode|string|number} mode 模式：25d或1，2d或2，3d或3
+     */
+    static changeSceneMode(viewer, mode) {
+        /*
+        let rectangle = viewer.camera.computeViewRectangle();
+        */
+
+        /** @type {SceneMode} */
+        let sceneMode = SceneMode.SCENE3D;
+        if (mode) {
+            if (mode === '25d') {
+                sceneMode = SceneMode.COLUMBUS_VIEW; //1
+            } else if (mode === '2d') {
+                sceneMode = SceneMode.SCENE2D; //2
+            } else if (mode === '3d') {
+                sceneMode = SceneMode.SCENE3D; //3
+            } else {
+                sceneMode = mode;
+            }
+        } else {
+            const currentMode = viewer.scene.mode;
+            const modes = [SceneMode.COLUMBUS_VIEW, SceneMode.SCENE2D, SceneMode.SCENE3D];
+            for (let i = 0; i < modes.length; i++) {
+                const m = modes[i];
+                if (m === currentMode) {
+                    if (i === modes.length - 1) {
+                        sceneMode = modes[0];
+                        break;
+                    } else {
+                        sceneMode = modes[i + 1];
+                    }
+                }
+            }
+        }
+
+        if (sceneMode === SceneMode.COLUMBUS_VIEW) {
+            viewer.scene.morphToColumbusView(0);
+        } else if (sceneMode === SceneMode.SCENE2D) {
+            const cartographic = viewer.scene.camera.positionCartographic;
+            let position = viewer.camera.pickEllipsoid(new Cartesian2(viewer.canvas.clientWidth / 2, viewer.canvas.clientHeight / 2));
+            position = this.changeHeight(position, cartographic.height);
+
+            viewer.scene.morphTo2D(0);
+            /* // 定位有问题，故取消动画效果
+            if (rectangle) {
+                setTimeout(function () {
+                    viewer.camera.flyTo({
+                        destination: rectangle
+                    });
+                }, 2000);
+            }
+            */
+            setTimeout(() => {
+                viewer.camera.setView({
+                    destination: position,
+                    orientation: new HeadingPitchRoll(viewer.scene.camera.heading, viewer.scene.camera.pitch, viewer.scene.camera.roll)
+                });
+            }, 300);
+        } else if (sceneMode === SceneMode.SCENE3D) {
+            // 二维切三维无法定位，故取消动画效果
+            viewer.scene.morphTo3D(0);
+        }
+
     }
 }

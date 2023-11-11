@@ -1,0 +1,155 @@
+﻿{
+  "type": "ui",
+  "floatToolbar": {
+    "type": "float",
+    "id": "_toolbarFloat",
+    "visible": true,
+    "items": [
+      {
+        "type": "default",
+        "name": "三维",
+        "desc": "切换地图模式。",
+        "visible": true,
+        "enabled": true,
+        "checked": false,
+        "checkbox": false,
+        "click": "",
+        "mode": "combobox",
+        "expandOnClick": true,
+        "closeOnClick": true,
+        "more": false,
+        "items": [
+          {
+            "type": "default",
+            "name": "二维",
+            "desc": "切换到二维模式。",
+            "visible": true,
+            "enabled": true,
+            "checked": false,
+            "checkbox": false,
+            "click": "this.map.changeSceneMode(2)",
+            "closeOnClick": true
+          },
+          {
+            "type": "default",
+            "name": "三维",
+            "desc": "切换到三维模式。",
+            "visible": true,
+            "enabled": true,
+            "checked": false,
+            "checkbox": false,
+            "click": "this.map.changeSceneMode(3)",
+            "closeOnClick": true
+          },
+          {
+            "type": "default",
+            "name": "2.5维",
+            "desc": "切换到2.5维模式。",
+            "visible": true,
+            "enabled": true,
+            "checked": false,
+            "checkbox": false,
+            "click": "this.map.changeSceneMode(1)",
+            "closeOnClick": true
+          }
+        ]
+      },
+      {
+        "type": "default",
+        "name": "控制",
+        "desc": "控制和管理图层、鹰眼图等地图微件。",
+        "visible": true,
+        "enabled": true,
+        "checked": false,
+        "checkbox": false,
+        "click": "",
+        "expandOnClick": true,
+        "closeOnClick": true,
+        "more": false,
+        "items": [
+          {
+            "type": "default",
+            "name": "地图选项",
+            "desc": "打开地图选项设置。",
+            "visible": true,
+            "enabled": true,
+            "checked": false,
+            "checkbox": false,
+            "click": "this.map.showMapOptions()",
+            "closeOnClick": true
+          },
+          {
+            "type": "default",
+            "name": "图层控制",
+            "desc": "打开图层控制器。",
+            "visible": true,
+            "enabled": true,
+            "checked": false,
+            "checkbox": false,
+            "click": "this.map.showLayerControl()",
+            "closeOnClick": true
+          },
+          {
+            "type": "default",
+            "name": "启动时间轴",
+            "desc": "时间轴启动，开始播放动画。",
+            "visible": true,
+            "enabled": true,
+            "checked": false,
+            "checkbox": false,
+            "click": "this.map.startAnimation()",
+            "closeOnClick": true
+          },
+          {
+            "type": "default",
+            "name": "停止时间轴",
+            "desc": "时间轴停止，暂停播放动画。",
+            "visible": true,
+            "enabled": true,
+            "checked": false,
+            "checkbox": false,
+            "click": "this.map.stopAnimation()",
+            "closeOnClick": true
+          },
+          {
+            "type": "default",
+            "name": "重置时间轴",
+            "desc": "重置动画。",
+            "visible": true,
+            "enabled": true,
+            "checked": false,
+            "checkbox": false,
+            "click": "this.map.resetAnimation()",
+            "closeOnClick": true
+          }
+        ]
+      },
+      {
+        "type": "default",
+        "name": "测试",
+        "desc": "测试专用。",
+        "visible": true,
+        "enabled": true,
+        "checked": false,
+        "checkbox": false,
+        "click": "",
+        "expandOnClick": true,
+        "closeOnClick": true,
+        "more": false,
+        "items": [
+          {
+            "type": "default",
+            "name": "内部测试",
+            "desc": "内部测试专用！",
+            "visible": true,
+            "enabled": true,
+            "checked": false,
+            "checkbox": false,
+            "click": "this.map.test()",
+            "closeOnClick": true
+          }
+        ]
+      }
+    ]
+  }
+}

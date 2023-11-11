@@ -105,6 +105,7 @@ const config = {
                 {from: path.join(cesiumSource, "../Build/Cesium/Widgets"), to: "Widgets"},
                 {from: path.join(cesiumSource, "../Build/Cesium/ThirdParty"), to: "ThirdParty"},
                 // {from: "src/Assets", to: "Assets/SimpleCesium"},
+                {from: "public/config", to: "config"}
             ]
         }), // 拷贝Cesium资源、控件、WebWorker到静态目录。
     ],

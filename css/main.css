@@ -35,6 +35,11 @@ body {
     padding: 0;
     overflow: hidden;
 }
+.simpleCesium ol, ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
 .simpleCesium .sc-widgets {
     position: absolute;
     top: 50px;
@@ -125,7 +130,7 @@ body {
     border-top: 1px solid #c8c8c8;
     margin: 8px 4px;
 }
-.simpleCesium .sc-widget .sc-widget-item{
+.simpleCesium .sc-widget .sc-widget-item {
     display: flex;
     align-items: center;
     height: 25px;
@@ -164,4 +169,289 @@ body {
 }
 .simpleCesium .sc-widget .sc-widget-treeNode:hover {
     box-shadow: 0 0 8px 0 rgba(225, 225, 225, 0.6) inset;
+}
+
+.simpleCesium .icon-up {
+    position: relative;
+    width: 16px;
+    height: 16px;
+    min-width: 16px;
+    min-height: 16px;
+    display: inline-block;
+}
+.simpleCesium .icon-up:before {
+    content: "";
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    top: 3px;
+    left: 3px;
+    border: 3px solid rgb(206, 217, 237);
+    border-bottom: 0;
+    border-right: 0;
+    background: transparent;
+    transform: rotate(45deg);
+}
+.simpleCesium .icon-up:after {
+    content: "";
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    top: 10px;
+    left: 3px;
+    border: 3px solid rgb(206, 217, 237);
+    border-bottom: 0;
+    border-right: 0;
+    background: transparent;
+    transform: rotate(45deg);
+}
+.simpleCesium .icon-down {
+    transform: rotate(180deg);
+}
+
+/**
+ * 工具栏
+ */
+.simpleCesium .helsing-toolbar {
+    pointer-events: none;
+    z-index: 9;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.simpleCesium .helsing-toolbar a, a:hover {
+    text-decoration: none;
+}
+/*.simpleCesium .helsing-toolbar a:hover { text-decoration: none; }*/
+/* 工具栏主体（默认显示） */
+.simpleCesium .helsing-toolbar > div:nth-child(1) {
+    pointer-events: auto;
+    display: flex;
+    position: absolute;
+    z-index: 9;
+    margin: 0 auto; /* centered toolbar */
+    overflow: visible;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+/* 【隐藏】按钮 */
+.simpleCesium .helsing-toolbar > div:nth-child(1) > div:nth-child(1) {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+.simpleCesium .helsing-toolbar > div:nth-child(1) > div:nth-child(1) > span {
+    display: inline-block;
+    min-width: 12px;
+    min-height: 20px;
+    cursor: pointer;
+}
+/* 工具按钮组 */
+.simpleCesium .helsing-toolbar > div:nth-child(1) > div:nth-child(2) {
+    overflow: hidden;
+}
+/* 所有级别的工具按钮样式 */
+.simpleCesium .helsing-toolbar > div:nth-child(1) > div:nth-child(2) > ul {
+    display: flex;
+    margin: 0;
+    padding: 0 4px;
+}
+/* 工具按钮悬停样式 */
+.simpleCesium .helsing-toolbar > div:nth-child(1) > div:nth-child(2) ul li:hover {
+    box-shadow: 0 0 8px rgb(255, 255, 255) inset;
+}
+/* 工具按钮内部样式 */
+.simpleCesium .helsing-toolbar > div:nth-child(1) > div:nth-child(2) ul li a {
+    display: flex;
+    flex: 1; /*IE */
+    float: left \0;
+    align-items: center;
+    align-items: flex-end \0;
+    white-space: nowrap; /*color: white;*/
+    padding: 2px;
+    text-align: center;
+    cursor: pointer;
+}
+/* 图标 */
+.simpleCesium .helsing-toolbar > div:nth-child(1) > div:nth-child(2) ul li a span {
+    background: url(../public/config/images/png_whitemodel_32x32.png) no-repeat center /16px;
+    min-width: 20px;
+    min-height: 20px;
+}
+/* 名称 */
+.simpleCesium .helsing-toolbar > div:nth-child(1) > div:nth-child(2) ul li a p { /*IE */
+    width: 100% \0;
+    text-align: left \0;
+}
+/* 嵌入页面容器 */
+.simpleCesium .helsing-toolbar > div:nth-child(1) > div:nth-child(2) ul li > div {
+    position: absolute;
+    width: 100%; /*min-width: 200px; max-width: 800px; min-height: 200px; max-height: 800px;*/
+    overflow-y: auto;
+    bottom: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    -moz-user-select: text;
+    -webkit-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+}
+/* 嵌入页面容器气泡三角 */
+.simpleCesium .helsing-toolbar > div:nth-child(1) > div:nth-child(2) ul li > span:nth-child(4) {
+    position: absolute;
+    display: block;
+    bottom: 100%;
+    width: 0;
+    height: 0;
+    border-width: 10px 10px 0 10px;
+    border-style: solid;
+    border-color: rgba(255, 255, 255, 0.2) transparent transparent transparent;
+    margin-left: 10px;
+}
+.simpleCesium .helsing-toolbar > div:nth-child(1) > div:nth-child(2) ul li > span:nth-child(4) > em {
+    position: absolute;
+    display: block;
+    bottom: 100%;
+    width: 0;
+    height: 0;
+    border-width: 10px 10px 0 10px;
+    border-style: solid;
+    border-color: rgba(0, 60, 90, 0.5) transparent transparent transparent;
+    margin: 0 0 1px -10px;
+}
+
+/* 不同级别的工具按钮样式 */
+.simpleCesium .helsing-toolbar > div:nth-child(1) > div:nth-child(2) > ul > li {
+    display: flex; /*IE */
+    display: block \0;
+    align-items: center;
+    margin: 0;
+    min-width: 20px;
+    min-height: 20px;
+}
+/* 儿子辈的子按钮列表 */
+.simpleCesium .helsing-toolbar > div:nth-child(1) > div:nth-child(2) > ul > li > ul {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    background-color: rgba(0, 0, 0, .5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+}
+.simpleCesium .helsing-toolbar > div:nth-child(1) > div:nth-child(2) > ul > li > ul li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100px \0; /*IE */
+    padding: 0 4px 4px 0;
+}
+/* 孙子辈及以后的子按钮列表 */
+.simpleCesium .helsing-toolbar > div:nth-child(1) > div:nth-child(2) > ul > li > ul li ul {
+    display: none;
+    white-space: nowrap;
+    flex-direction: column;
+    position: absolute;
+    left: 100%;
+    background-color: rgba(0, 0, 0, .5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+}
+/* 更多按钮 */
+.simpleCesium .helsing-toolbar > div:nth-child(1) > div:nth-child(2) > ul > li > span:nth-child(2) {
+    float: right \0; /*IE */
+    width: 0;
+    height: 0;
+    min-width: 0;
+    min-height: 0;
+    margin: 0 0 0 2px;
+    margin: 8px 0 0 2px \0; /* IE */
+    background: unset;
+    background: none;
+    border-style: solid;
+    border-width: 6px 6px 0 6px;
+    border-color: rgb(255, 255, 255) transparent transparent transparent;
+}
+.simpleCesium .helsing-toolbar > div:nth-child(1) > div:nth-child(2) > ul > li > ul li > span:nth-child(2) {
+    float: right \0; /*IE */
+    width: 0;
+    height: 0;
+    min-width: 0;
+    min-height: 0;
+    margin: 1px 0 0 2px;
+    background: unset;
+    background: none;
+    border-style: solid;
+    border-width: 6px 0 6px 6px;
+    border-color: transparent transparent transparent rgb(255, 255, 255);
+}
+/* 【移动】按钮 */
+.simpleCesium .helsing-toolbar > div:nth-child(1) > div:nth-child(3) {
+    display: inline-block;
+    min-width: 12px;
+    min-height: 20px;
+    border-radius: 0 10px 10px 0;
+    border-left: 1px solid rgb(238, 238, 238);
+    margin-right: -5px;
+    background-color: rgba(255, 255, 255, 0.1);
+    cursor: move;
+}
+/* 【显示】按钮（默认隐藏） */
+.simpleCesium .helsing-toolbar > div:nth-child(2) {
+    pointer-events: auto;
+    display: none;
+    /*position: absolute;*/
+    z-index: 9;
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    opacity: 0.2;
+}
+.simpleCesium .helsing-toolbar > div:nth-child(2):hover {
+    opacity: 1;
+}
+.simpleCesium .helsing-toolbar > div:nth-child(2) > span {
+    display: inline-block;
+    min-width: 20px;
+    min-height: 20px;
+    cursor: pointer;
+}
+
+/* 浮动 */
+.simpleCesium .helsing-toolbar-float {
+    bottom: 24px;
+    width: 100%;
+    display: flex;
+    position: absolute;
+    justify-content: center;
+}
+.simpleCesium .helsing-toolbar-float > div:nth-child(1) {
+    position: relative;
+    justify-content: center;
+    min-width: 50px;
+    bottom: 0;
+    padding: 0 5px 0 0;
+    margin: 0 30px; /*right: 40px; left: 40px;*/
+}
+.simpleCesium .helsing-toolbar-float > div:nth-child(1) > div:nth-child(1) > span {
+    height: 100%;
+    min-width: 12px;
+    min-height: 20px;
+    cursor: pointer;
+    border-right: 1px solid rgb(238, 238, 238);
+}
+.simpleCesium .helsing-toolbar-float > div:nth-child(1) > div:nth-child(2) > ul {
+    flex-wrap: wrap-reverse;
+}
+.simpleCesium .helsing-toolbar-float > div:nth-child(1) > div:nth-child(2) > ul > li {
+    padding: 0 8px 0 0;
+}
+.simpleCesium .helsing-toolbar-float > div:nth-child(1) > div:nth-child(2) > ul > li > ul {
+    top: auto;
+    bottom: 100%;
+}
+.simpleCesium .helsing-toolbar-float > div:nth-child(1) > div:nth-child(2) > ul > li > ul li ul {
+    bottom: auto;
 }

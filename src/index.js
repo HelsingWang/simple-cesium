@@ -1,10 +1,26 @@
 import '/css/main.css';
-import {ScMap} from './core/ScMap';
+import {SimpleMap} from './core/SimpleMap';
+import {Util} from './common/Util';
+import {ToolbarWidget} from './widgets/ToolbarWidget';
 
-// Just for test
-new ScMap();
+// startUp
+const map = new SimpleMap();
+Util.get('config/ui.json', function (text) {
+    if (text) {
+        text = Util.removeComments(text);
+        const jsonData = JSON.parse(text);
+        if (jsonData) {
+            if (jsonData.floatToolbar && jsonData.floatToolbar.items) {
+                const floatToolbar = new ToolbarWidget({...jsonData.floatToolbar, map: map});
+                floatToolbar.addAll();
+                floatToolbar.startUp();
+            }
+        }
+    }
+});
 
+// export
 export var VERSION = '1.0';
 console.log('SimpleCesium V' + VERSION);
 
-export {ScMap, ScMap as ScViewer} from './core/ScMap';
+export {SimpleMap} from './core/SimpleMap';
