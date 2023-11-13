@@ -12,8 +12,17 @@ import {
     Model,
     ScreenSpaceEventType,
     ScreenSpaceEventHandler,
-    Transforms, SceneMode, Cartesian2, PrimitiveCollection
+    Transforms,
+    SceneMode,
+    Cartesian2,
+    PrimitiveCollection,
+    Matrix4,
+    Matrix3,
+    GeometryInstance,
+    MaterialAppearance,
+    Material, GroundPolylinePrimitive, Primitive, GroundPrimitive, SampledPositionProperty
 } from 'cesium';
+import {Util} from './Util';
 
 /**
  * Cesium函数工具类。
@@ -198,6 +207,85 @@ export class CesiumUtil {
         return result;
     }
 
+    /**
+     * 添加简易图元。
+     *
+     * @param {PrimitiveCollection} collection 图元集合。
+     * @param {Object} options 选项。
+     * @param {string} options.geometryType 几何类型。
+     * @param {Geometry} options.geometry 几何图形。
+     * @param {Material} [options.material] 材质。
+     * @param {string|Color} [options.color] 颜色。
+     * @param {number[]} [options.position] 位置。
+     * @param {number} [options.heading] 偏移角。
+     * @param {number} [options.pitch] 俯仰角。
+     * @param {number} [options.roll] 翻滚角。
+     * @param {boolean} [options.flat] 是否扁平化。
+     * @param {boolean} [options.faceForward] 是否面向前面。
+     * @param {boolean} [options.translucent] 是否半透明。
+     * @param {boolean} [options.closed] 是否闭合。
+     * @param {boolean} [options.vertexShaderSource] 顶点着色器代码。
+     * @param {boolean} [options.fragmentShaderSource] 片元着色器代码。
+     * @param {boolean} [options.asynchronous] 是否异步。
+     * @param {boolean} [options.clampToGround] 是否贴地。
+     * @return {Primitive|GroundPrimitive|GroundPolylinePrimitive} 图元。
+     */
+    static addSimplePrimitiveFeature(collection, options) {
+        if (options) {
+            let modelMatrix;
+            if (options.position) {
+                modelMatrix = Transforms.eastNorthUpToFixedFrame(this.getCesiumPosition(options.position));
+                Matrix4.multiplyByMatrix3(modelMatrix, Matrix3.fromHeadingPitchRoll(HeadingPitchRoll.fromDegrees(options.heading ?? 0, options.pitch ?? 0, options.roll ?? 0)), modelMatrix);
+            }
+            const data = {
+                geometryInstances: [
+                    new GeometryInstance({
+                        geometry: options.geometry
+                        /*attributes: {
+                            color: ColorGeometryInstanceAttribute.fromColor(Color.fromCssColorString(options.color))
+                        }*/
+                    })
+                ],
+                appearance: new MaterialAppearance({
+                    material: options.material || new Material({
+                        fabric: {
+                            type: 'Color',
+                            uniforms: {
+                                color: this.getCesiumColor(options.color)
+                            }
+                        }
+                    }),
+                    flat: options.flat ?? false,
+                    faceForward: options.faceForward ?? false,
+                    translucent: options.translucent ?? true,
+                    closed: options.closed ?? false,
+                    vertexShaderSource: options.vertexShaderSource,
+                    fragmentShaderSource: options.fragmentShaderSource
+                }),
+                asynchronous: options.asynchronous ?? false,
+                modelMatrix: modelMatrix
+            };
+            let primitive;
+            if (options.geometryType === 'polyline') {
+                primitive = options.clampToGround ? new GroundPolylinePrimitive(data) : new Primitive(data);
+            } else {
+                primitive = options.clampToGround ? new GroundPrimitive(data) : new Primitive(data);
+            }
+
+            // 自定义属性
+            primitive['id'] = options['id'] ?? Util.getGuid();
+            primitive['name'] = options['name'] ?? 'SimplePrimitiveFeature';
+            primitive['desc'] = options['text'] ?? '简易图元要素';
+            primitive['layerId'] = options['layerId'] ?? 'PRIMITIVE_FEATURE_LAYER';
+            primitive['layerName'] = options['layerName'] ?? 'PrimitiveFeatureLayer';
+            primitive['layerDesc'] = options['layerDesc'] ?? '图元要素图层';
+
+            collection.add(primitive);
+
+            return primitive;
+        }
+    }
+
     //#endregion
 
     //#region 动画时间轴
@@ -251,6 +339,51 @@ export class CesiumUtil {
 
     //#endregion
 
+    //#region 转换
+
+    /**
+     * 获取Cesium引擎使用的颜色对象。
+     *
+     * @param {string|Color} color CSS颜色字符串。如果传入的是"random"字符串，则返回一个随机颜色值；如果传入的是Cesium.Color对象，则返回对象本身。
+     * @return {Color} Cesium颜色对象。
+     */
+    static getCesiumColor(color) {
+        let result = Color.WHITE;
+        if (color instanceof Color) {
+            result = color;
+        } else if (typeof color === 'string') {
+            if (color?.toLowerCase() === 'random') {
+                result = Color.fromRandom();
+            } else if (color?.toLowerCase() === 'transparent') {
+                result = Color.TRANSPARENT;
+            } else {
+                result = Color.fromCssColorString(color);
+            }
+        }
+        !result && (result = Color.WHITE);
+        return result;
+    }
+
+    /**
+     * 获取Cesium引擎使用的世界坐标对象。
+     *
+     * @param position 原始坐标点。
+     * @return {Cartesian3 | SampledPositionProperty | CallbackProperty} 返回值类型为坐标点、采样点属性或回调属性。
+     */
+    static getCesiumPosition(position) {
+        let result;
+        if (position instanceof Cartesian3) {
+            result = position;
+        } else if (position instanceof Cartographic) {
+            result = Cartographic.toCartesian(position);
+        } else if (position instanceof Array && position.length >= 0) {
+            result = Cartesian3.fromDegrees(position[0], position[1], position[2]);
+        } else if (position instanceof SampledPositionProperty || position instanceof CallbackProperty) {
+            result = position;
+        }
+        return result;
+    }
+
     /**
      * 改变坐标点的高度。
      *
@@ -267,6 +400,32 @@ export class CesiumUtil {
             return ellipsoid.cartographicToCartesian(newCartographic);
         }
     }
+
+    //#endregion
+
+    //#region 数学
+
+    /**
+     * 将一个点向某个方向（xyz三个距离分量）平移一段距离。
+     *
+     * @param position 起点。
+     * @param distanceArr 距离数组。
+     * @return 返回平移后的坐标。
+     */
+    static translate(position, distanceArr) {
+        const startWorldMatrix = Transforms.eastNorthUpToFixedFrame(position);
+        const translationMatrix = new Matrix4();
+        const resultMatrix = new Matrix4();
+        Matrix4.setTranslation(Matrix4.IDENTITY, new Cartesian3(distanceArr[0] ?? 0, distanceArr[1] ?? 0, distanceArr[2] ?? 0), translationMatrix);
+        Matrix4.multiply(startWorldMatrix, translationMatrix, resultMatrix);
+        const result = new Cartesian3();
+        Matrix4.getTranslation(resultMatrix, result);
+        return result;
+    }
+
+    //#endregion
+
+    //#region 视图
 
     /**
      * 切换二三维模式。
@@ -336,4 +495,6 @@ export class CesiumUtil {
         }
 
     }
+
+    //#endregion
 }

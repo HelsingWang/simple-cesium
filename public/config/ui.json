@@ -126,6 +126,43 @@
       },
       {
         "type": "default",
+        "name": "材质",
+        "desc": "自定义材质。",
+        "visible": true,
+        "enabled": true,
+        "checked": false,
+        "checkbox": false,
+        "click": "",
+        "expandOnClick": true,
+        "closeOnClick": true,
+        "more": false,
+        "items": [
+          {
+            "type": "default",
+            "name": "矩形材质",
+            "desc": "矩形材质",
+            "visible": true,
+            "enabled": true,
+            "checked": false,
+            "checkbox": false,
+            "click": "this.map.rectMaterial()",
+            "closeOnClick": true
+          },
+          {
+            "type": "default",
+            "name": "圆形材质",
+            "desc": "圆形材质",
+            "visible": true,
+            "enabled": true,
+            "checked": false,
+            "checkbox": false,
+            "click": "this.map.circleMaterial()",
+            "closeOnClick": true
+          }
+        ]
+      },
+      {
+        "type": "default",
         "name": "测试",
         "desc": "测试专用。",
         "visible": true,

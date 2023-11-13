@@ -1,8 +1,12 @@
 import 'cesium/Source/Widgets/widgets.css';
 import {
+    BoundingSphere,
     Cartesian3,
+    EllipseGeometry,
     Ion,
     Math as CesiumMath,
+    Rectangle,
+    RectangleGeometry,
     Viewer
 } from 'cesium';
 import createOsmBuildingsAsync from '/node_modules/@cesium/engine/Source/Scene/createOsmBuildingsAsync';
@@ -13,6 +17,7 @@ import {Util} from '../common/Util';
 import {CesiumUtil} from '../common/CesiumUtil';
 import {ObjectBase} from './ObjectBase';
 import ViewerHtml from './SimpleMap.html';
+import {RadarScanCircleMaterial} from '../materials/RadarScanCircleMaterial';
 
 /**
  * 地图。
@@ -135,6 +140,8 @@ export class SimpleMap extends ObjectBase {
         CesiumUtil.changeSceneMode(this.viewer, mode);
     }
 
+    //#region 控制
+
     /**
      * 显示地图选项面板。
      */
@@ -142,14 +149,12 @@ export class SimpleMap extends ObjectBase {
         !this.viewer['scMapOptions'] && this.viewer.extend(viewerMapOptionsMixin);
     }
 
-
     /**
      * 显示地图选项面板。
      */
     showLayerControl() {
         !this.viewer['scLayerControl'] && this.viewer.extend(viewerLayerControlMixin);
     }
-
 
     /**
      * 启动动画。
@@ -194,4 +199,129 @@ export class SimpleMap extends ObjectBase {
     }
 
     //#endregion
+
+    //#region 材质
+
+    rectMaterial(options) {
+        const position = CesiumUtil.getCesiumPosition(options?.position || [80, 39]);
+        const radius = options.radius ?? 40000.0;
+        const name = options.name || '矩形材质';
+        const type = options.type ?? 0.0;
+        const zoomTo = options.zoomTo ?? false;
+        CesiumUtil.addSimplePrimitiveFeature(this.viewer.scene.primitives, {
+            name: name,
+            geometry: new RectangleGeometry({
+                rectangle: Rectangle.fromCartesianArray([
+                    CesiumUtil.translate(position, [-radius, radius, 0]),
+                    CesiumUtil.translate(position, [radius, -radius, 0])
+                ])
+            }),
+            material: new RadarScanCircleMaterial({
+                ...options.uniforms,
+                type: type
+            })
+        });
+        zoomTo && this.viewer.camera.flyToBoundingSphere(new BoundingSphere(position, radius * 1.5));
+    }
+
+    circleMaterial(options) {
+        const position = CesiumUtil.getCesiumPosition(options?.position || [80, 40]);
+        const radius = options.radius ?? 40000.0;
+        const name = options.name || '圆形材质';
+        const type = options.type ?? 0.0;
+        const zoomTo = options.zoomTo ?? false;
+        CesiumUtil.addSimplePrimitiveFeature(this.viewer.scene.primitives, {
+            name: name,
+            geometry: new EllipseGeometry({
+                center: position,
+                semiMajorAxis: radius,
+                semiMinorAxis: radius,
+                rotation: CesiumMath.toRadians(60.0)
+            }),
+            material: new RadarScanCircleMaterial({
+                ...options,
+                type: type
+            })
+        });
+        zoomTo && this.viewer.camera.flyToBoundingSphere(new BoundingSphere(position, radius * 1.5));
+    }
+
+    //#endregion
+
+    //#endregion
+
+    test() {
+        /*this.rectMaterial({
+            name: 'x轴向渐变矩形材质',
+            type: 1.1,
+            position:[80, 39],
+            zoomTo: true
+        })
+        this.rectMaterial({
+            name: 'y轴向渐变矩形材质',
+            position:[81, 39],
+            type: 1.2,
+        })
+        this.rectMaterial({
+            name: '中心向外渐变矩形材质',
+            position:[82, 39],
+            type: 2.1,
+        })
+        this.rectMaterial({
+            name: '中心向外渐变矩形材质',
+            position:[83, 39],
+            type: 2.2,
+        })
+        this.rectMaterial({
+            name: '外部向中心渐变矩形材质',
+            position:[84, 39],
+            type: 2.3,
+        })
+        this.rectMaterial({
+            name: '外部向中心渐变矩形材质',
+            position:[85, 39],
+            type: 2.4,
+        })
+        this.circleMaterial({
+            name: 'x轴向渐变矩形材质',
+            type: 1.1,
+            position:[80, 38],
+        })
+        this.circleMaterial({
+            name: 'y轴向渐变矩形材质',
+            position:[81, 38],
+            type: 1.2,
+        })
+        this.circleMaterial({
+            name: '中心向外部渐变矩形材质',
+            position:[82, 38],
+            type: 2.1,
+        })
+        this.circleMaterial({
+            name: '中心向外部渐变矩形材质',
+            position:[83, 38],
+            type: 2.2,
+        })
+        this.circleMaterial({
+            name: '外部向中心渐变矩形材质',
+            position:[84, 38],
+            type: 2.3,
+        })
+        this.circleMaterial({
+            name: '外部向中心渐变矩形材质',
+            position:[85, 38],
+            type: 2.4,
+        })*/
+        this.circleMaterial({
+            name: '雷达扫描',
+            zoomTo: true,
+            position: [85, 38],
+            type: 2.4,
+            color: 'rgb(0,255,50)',
+            backgroundColor: 'rgba(0,255,50,0.2)',
+            sectorColor: 'rgb(0,255,50)',
+            radians: Math.PI * 3 / 8,
+            offset: 0.2
+        });
+    }
 }
