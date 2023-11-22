@@ -163,6 +163,54 @@
       },
       {
         "type": "default",
+        "name": "着色器",
+        "desc": "着色器相关。",
+        "visible": true,
+        "enabled": true,
+        "checked": false,
+        "checkbox": false,
+        "click": "",
+        "expandOnClick": true,
+        "closeOnClick": true,
+        "more": false,
+        "items": [
+          {
+            "type": "default",
+            "name": "模型压平",
+            "desc": "将模型压平到地表",
+            "visible": true,
+            "enabled": true,
+            "checked": false,
+            "checkbox": false,
+            "click": "this.map.flattenModel()",
+            "closeOnClick": true
+          },
+          {
+            "type": "default",
+            "name": "模型炸开",
+            "desc": "将模型压炸开",
+            "visible": true,
+            "enabled": true,
+            "checked": false,
+            "checkbox": false,
+            "click": "this.map.explodeModel()",
+            "closeOnClick": true
+          },
+          {
+            "type": "default",
+            "name": "模型渲染",
+            "desc": "渲染模型",
+            "visible": true,
+            "enabled": true,
+            "checked": false,
+            "checkbox": false,
+            "click": "this.map.renderModel()",
+            "closeOnClick": true
+          }
+        ]
+      },
+      {
+        "type": "default",
         "name": "测试",
         "desc": "测试专用。",
         "visible": true,
@@ -183,6 +231,28 @@
             "checked": false,
             "checkbox": false,
             "click": "this.map.test()",
+            "closeOnClick": true
+          },
+          {
+            "type": "default",
+            "name": "相机信息",
+            "desc": "获取相机信息。",
+            "visible": true,
+            "enabled": true,
+            "checked": false,
+            "checkbox": false,
+            "click": "this.map.getCameraInfo()",
+            "closeOnClick": true
+          },
+          {
+            "type": "default",
+            "name": "拾取点坐标",
+            "desc": "拾取点坐标。",
+            "visible": true,
+            "enabled": true,
+            "checked": false,
+            "checkbox": false,
+            "click": "this.map.pickPoint()",
             "closeOnClick": true
           }
         ]

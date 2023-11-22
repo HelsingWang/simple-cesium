@@ -20,7 +20,14 @@ import {
     Matrix3,
     GeometryInstance,
     MaterialAppearance,
-    Material, GroundPolylinePrimitive, Primitive, GroundPrimitive, SampledPositionProperty
+    Material,
+    GroundPolylinePrimitive,
+    Primitive,
+    GroundPrimitive,
+    SampledPositionProperty,
+    Math,
+    CustomShader,
+    UniformType
 } from 'cesium';
 import {Util} from './Util';
 
@@ -342,6 +349,17 @@ export class CesiumUtil {
     //#region 转换
 
     /**
+     * 世界坐标转经纬度坐标。
+     *
+     * @param worldCoordinates 世界坐标。
+     * @param [ellipsoid] 空间参考椭球。
+     */
+    static cartesian3ToDegrees(worldCoordinates, ellipsoid) {
+        const cartographic = Cartographic.fromCartesian(worldCoordinates, ellipsoid);
+        return [Math.toDegrees(cartographic.longitude), Math.toDegrees(cartographic.latitude), cartographic.height];
+    }
+
+    /**
      * 获取Cesium引擎使用的颜色对象。
      *
      * @param {string|Color} color CSS颜色字符串。如果传入的是"random"字符串，则返回一个随机颜色值；如果传入的是Cesium.Color对象，则返回对象本身。
@@ -494,6 +512,282 @@ export class CesiumUtil {
             viewer.scene.morphTo3D(0);
         }
 
+    }
+
+    /**
+     * 获取相机视角信息。
+     *
+     * @param {Camera} camera 三维视窗。
+     * @param {string} lineBreak 换行符。
+     * @return {string} JSON格式字符串。
+     */
+    static getCameraInfo(camera, lineBreak = '\n') {
+        let text = '';
+        text += 'longitude: ' + CesiumMath.toDegrees(camera.positionCartographic.longitude) + ',' + lineBreak;
+        text += 'latitude: ' + CesiumMath.toDegrees(camera.positionCartographic.latitude) + ',' + lineBreak;
+        text += 'height: ' + camera.positionCartographic.height + ',' + lineBreak;
+        text += 'heading: ' + CesiumMath.toDegrees(camera.heading) + ',' + lineBreak;
+        text += 'pitch: ' + CesiumMath.toDegrees(camera.pitch) + ',' + lineBreak;
+        text += 'roll: ' + CesiumMath.toDegrees(camera.roll) + ',' + lineBreak;
+        return text;
+    }
+
+    /**
+     * 点击拾取坐标信息。
+     *
+     * @param {Viewer} viewer 三维视窗。
+     * @param {function} callback 回调函数。
+     */
+    static pickPoint(viewer, callback) {
+        const handler = new ScreenSpaceEventHandler(viewer.canvas);
+        handler.setInputAction((movement) => {
+            handler.destroy();
+            typeof callback === 'function' && callback(viewer.scene.pickPosition(movement.position));
+        }, ScreenSpaceEventType.LEFT_CLICK);
+    }
+
+    //#endregion
+
+    //#region 着色器
+
+
+    /**
+     * 模型压平。
+     *
+     * @param {Object} [options] 选项。
+     */
+    static customShader(options = {}) {
+        const type = options.type || 'render';
+        const viewer = options.viewer;
+        const tileset = options.tileset;
+        // const positions = options.positions;
+        // 如果是GLTF模型，则设置为模型的中心。
+        // const center = tileset.boundingSphere.center;
+        const center = this.getCesiumPosition(options.position || [121.49515381925019, 31.241921435952527, 20]);
+        const modelCenterMat = new Matrix4();
+        const inverseModelCenterMat = new Matrix4();
+        Transforms.eastNorthUpToFixedFrame(center, viewer.scene.globe.ellipsoid, modelCenterMat);
+        Matrix4.inverse(modelCenterMat, inverseModelCenterMat);
+        const flatteningHeight = options.flatteningHeight ?? 0;
+        let vertexShaderText;
+        let fragmentShaderText;
+
+        switch (type) {
+            case 'flatten' :
+                vertexShaderText = `
+                    void vertexMain(VertexInput vsInput, inout czm_modelVertexOutput vsOutput) {                  
+                    // 模型世界坐标的齐次坐标 = 中心点逆矩阵 * Cesium模型转换矩阵 * 模型局部坐标的齐次坐标
+                    vec4 worldPosition = u_inverseModelCenterMat * czm_model * vec4(vsInput.attributes.positionMC, 1.0);
+                    // 当模型世界坐标的z值大于压平高度值时，将z值设为高度值。
+                    if (worldPosition.z > u_flatteningHeight) {
+                        worldPosition.z = u_flatteningHeight;
+                    }
+                    // 模型局部坐标的齐次坐标 = Cesium模型转换逆矩阵 * 中心点矩阵 * 模型世界坐标的齐次坐标
+                    vec4 modelPosition = czm_inverseModel * u_modelCenterMat * worldPosition;
+                    // 模型局部坐标赋值
+                    vsOutput.positionMC = modelPosition.xyz;
+                    
+                    // 直接设置模型的Z轴高度值，简单粗暴，但问题很多
+                    // vsOutput.positionMC.z = u_flatteningHeight ;
+                    }
+                `;
+                break;
+            case 'explode' :
+                vertexShaderText = `
+                    void vertexMain(VertexInput vsInput, inout czm_modelVertexOutput vsOutput) {                  
+                       // 炸开模型
+                       vsOutput.positionMC += 0.01 * u_drag.x * vsInput.attributes.normalMC;
+                    }
+                `;
+                break;
+            case 'render':
+            default:
+                fragmentShaderText = `
+                    void fragmentMain(FragmentInput fsInput, inout czm_modelMaterial material)
+                    {
+                        vec3 modelPosition = fsInput.attributes.positionMC;
+                        vec3 cameraPosition = fsInput.attributes.positionEC;                    
+                        vec4 worldPosition = czm_inverseModelView * vec4(fsInput.attributes.positionEC, 1.0);
+                        vec2 uv = fsInput.attributes.positionMC.xy;
+                        float distance = length(gl_PointCoord - 0.5);
+                        float helsing_frame = fract(czm_frameNumber / 720.0);
+                        helsing_frame = abs(helsing_frame - 0.5) * 2.0;
+                        
+                        // material.diffuse.g = -cameraPosition.z / 1.0e4;
+                        // material.diffuse = 0.2 * fsInput.attributes.color_0.rgb;
+                        
+                        // 霓虹灯
+                        float interval = mod(helsing_frame, 1.0); // mod(u_time / 5.0, 1.0);
+                        material.diffuse += vec3(0.1, 0.2, 0.3) + modelPosition.z / 1.0e4 - interval;
+                        
+                        // 模型渐变
+                        float helsing_colorDepth = 20.0;          
+                        float helsing_lineHeight = 500.0;
+                        // material.diffuse *= vec3(modelPosition.z / helsing_colorDepth);
+                        
+                        // 发光线
+                        float helsing_diff = step(0.005, abs(clamp(worldPosition.z / helsing_lineHeight, 0.0, 1.0) - helsing_frame));
+                        material.diffuse += material.diffuse * (1.0 - helsing_diff);
+                        
+                        // pbr
+                        material.specular = vec3(0.1, 0.6, 1.0);
+                        material.roughness = 0.1;
+                    }
+                `;
+                break;
+        }
+
+        tileset.customShader = new CustomShader({
+            // lightingModel: LightingModel.UNLIT,
+            uniforms: {
+                u_flatteningHeight: {
+                    type: UniformType.FLOAT,
+                    value: flatteningHeight
+                },
+                u_modelCenterMat: {
+                    type: UniformType.MAT4,
+                    value: modelCenterMat
+                },
+                u_inverseModelCenterMat: {
+                    type: UniformType.MAT4,
+                    value: inverseModelCenterMat
+                },
+                u_drag: {
+                    type: UniformType.VEC2,
+                    value: new Cartesian2(0.0, 0.0)
+                },
+                u_time: {
+                    type: UniformType.FLOAT,
+                    value: 0
+                }
+            },
+            vertexShaderText: vertexShaderText,
+            fragmentShaderText: fragmentShaderText
+        });
+
+        /*tileset.customShader = new CustomShader({
+            uniforms: {
+                u1pos: {
+                    type: UniformType.VEC3,
+                    value: CesiumUtil.getCesiumPosition(positions[0])
+                },
+                u2pos: {
+                    type: UniformType.VEC3,
+                    value: CesiumUtil.getCesiumPosition(positions[1])
+                },
+                u3pos: {
+                    type: UniformType.VEC3,
+                    value: CesiumUtil.getCesiumPosition(positions[2])
+                },
+                u4pos: {
+                    type: UniformType.VEC3,
+                    value: CesiumUtil.getCesiumPosition(positions[3])
+                }
+            },
+            vertexShaderText: `
+                void vertexMain(VertexInput vsInput, inout czm_modelVertexOutput vsOutput) {
+                    vec3 p = vsOutput.positionMC;
+                    float px = p.x;
+                    float py = p.z;
+                    float pz = p.z;
+                    vec4 u1posMC = czm_inverseModel * vec4(u1pos,1.);
+                    vec4 u2posMC = czm_inverseModel * vec4(u2pos,1.);
+                    vec4 u3posMC = czm_inverseModel * vec4(u3pos,1.);
+                    vec4 u4posMC = czm_inverseModel * vec4(u4pos,1.);
+                    bool flag = false;
+                    vec4 tem1;
+                    vec4 tem2;
+
+                    for(int i=0;i<4;i++){
+                        if(i == 0) {
+                            tem1 = u1posMC;
+                            tem2 = u4posMC;
+                        }
+                        else if(i == 1){
+                            tem1 = u2posMC;
+                            tem2 = u1posMC;
+                        }
+                        else if(i == 2){
+                            tem1 = u3posMC;
+                            tem2 = u2posMC;
+                        }
+                        else {
+                            tem1 = u4posMC;
+                            tem2 = u3posMC;
+                        }
+
+                        float sx = tem1.x;
+                        float sy = tem1.y;
+                        float sz = tem1.z;
+                        float tx = tem2.x;
+                        float ty = tem2.y;
+                        float tz = tem2.z;
+
+                        if((sy < py && ty >= py) || (sy >= py && ty < py)) {
+                            float x = sx + (py - sy) * (tx - sx) / (ty - sy);
+                            if(x > px) {
+                                flag = !flag;
+                            }
+                        }
+
+                        // if((sz < pz && tz >= pz) || (sz >= pz && tz < pz)) {
+                        //     float x = sx + (pz - sz) * (tx - sx) / (tz - sz);
+                        //     if(x > px) {
+                        //         flag = !flag;
+                        //     }
+                        // }
+                    }
+                    if(flag){
+                        vsOutput.positionMC.z = tem1.z ;
+                        // vsOutput.positionMC.y = tem1.y ;
+                    }
+                }
+            `
+        });*/
+
+        if (type === 'explode') {
+            let dragActive = false;
+            const dragCenter = new Cartesian2();
+            const scratchDrag = new Cartesian2();
+            const startTime = performance.now();
+
+            viewer.screenSpaceEventHandler.setInputAction((movement) => {
+                const pickedFeature = viewer.scene.pick(movement.position);
+                if (!pickedFeature) {
+                    return;
+                }
+
+                viewer.scene.screenSpaceCameraController.enableInputs = false;
+
+                // set the new drag center
+                dragActive = true;
+                movement.position.clone(dragCenter);
+            }, ScreenSpaceEventType.LEFT_DOWN);
+
+            viewer.screenSpaceEventHandler.setInputAction((movement) => {
+                if (dragActive) {
+                    // get the mouse position relative to the center of the screen
+                    const drag = Cartesian3.subtract(
+                        movement.endPosition,
+                        dragCenter,
+                        scratchDrag
+                    );
+
+                    // Update uniforms
+                    tileset.customShader.setUniform('u_drag', drag);
+                }
+            }, ScreenSpaceEventType.MOUSE_MOVE);
+
+            viewer.screenSpaceEventHandler.setInputAction(() => {
+                viewer.scene.screenSpaceCameraController.enableInputs = true;
+                dragActive = false;
+            }, ScreenSpaceEventType.LEFT_UP);
+
+            viewer.scene.postUpdate.addEventListener(() => {
+                const elapsedTimeSeconds = (performance.now() - startTime) / 1000;
+                tileset.customShader.setUniform('u_time', elapsedTimeSeconds);
+            });
+        }
     }
 
     //#endregion
