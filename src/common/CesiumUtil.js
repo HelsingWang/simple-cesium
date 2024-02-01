@@ -1,34 +1,4 @@
-import {
-    CallbackProperty,
-    Cartesian3,
-    Cartographic,
-    Math as CesiumMath,
-    Color,
-    defined,
-    Ellipsoid,
-    HeadingPitchRoll,
-    //HeightReference,
-    JulianDate,
-    Model,
-    ScreenSpaceEventType,
-    ScreenSpaceEventHandler,
-    Transforms,
-    SceneMode,
-    Cartesian2,
-    PrimitiveCollection,
-    Matrix4,
-    Matrix3,
-    GeometryInstance,
-    MaterialAppearance,
-    Material,
-    GroundPolylinePrimitive,
-    Primitive,
-    GroundPrimitive,
-    SampledPositionProperty,
-    Math,
-    CustomShader,
-    UniformType
-} from 'cesium';
+import * as Cesium from 'cesium';
 import {Util} from './Util';
 
 /**
@@ -46,7 +16,7 @@ export class CesiumUtil {
     /**
      * 加载GLTF数据。
      *
-     * @param {Viewer} viewer Cesium视窗。
+     * @param {Cesium.Viewer} viewer Cesium视窗。
      * @param {Object} layer 图层对象。
      * @param {string} layer.url 数据地址。
      * @param {number[]} layer.position 坐标点。
@@ -64,24 +34,24 @@ export class CesiumUtil {
         const id = layer.id;
 
         let position, realPosition;
-        if (layer.position instanceof CallbackProperty) {
+        if (layer.position instanceof Cesium.CallbackProperty) {
             position = layer.position;
-            realPosition = position.getValue(JulianDate.fromIso8601(new Date().toISOString()));
-        } else if (layer.position instanceof Cartesian3) {
+            realPosition = position.getValue(Cesium.JulianDate.fromIso8601(new Date().toISOString()));
+        } else if (layer.position instanceof Cesium.Cartesian3) {
             realPosition = position = layer.position;
         } else {
-            realPosition = position = Cartesian3.fromDegrees(layer.position[0], layer.position[1], layer.position[2]);
+            realPosition = position = Cesium.Cartesian3.fromDegrees(layer.position[0], layer.position[1], layer.position[2]);
         }
 
-        let hpr = new HeadingPitchRoll(0, 0, 0);
+        let hpr = new Cesium.HeadingPitchRoll(0, 0, 0);
         if (layer.orientation) {
-            const heading = CesiumMath.toRadians(layer.orientation[0]) || 0;
-            const pitch = CesiumMath.toRadians(layer.orientation[1]) || 0; // CesiumMath.toRadians(90);
-            const roll = CesiumMath.toRadians(layer.orientation[2]) || 0;
-            hpr = new HeadingPitchRoll(heading, pitch, roll);
+            const heading = Cesium.Math.toRadians(layer.orientation[0]) || 0;
+            const pitch = Cesium.Math.toRadians(layer.orientation[1]) || 0; // CesiumMath.toRadians(90);
+            const roll = Cesium.Math.toRadians(layer.orientation[2]) || 0;
+            hpr = new Cesium.HeadingPitchRoll(heading, pitch, roll);
         }
 
-        const orientation = Transforms.headingPitchRollQuaternion(realPosition, hpr);
+        const orientation = Cesium.Transforms.headingPitchRollQuaternion(realPosition, hpr);
         const minimumPixelSize = layer.minimumPixelSize || 0;
         const maximumScale = layer.maximumScale || 20000;
         const scale = layer.scale || 1;
@@ -102,8 +72,8 @@ export class CesiumUtil {
                 }
             });
         } else {
-            const modelMatrix = Transforms.headingPitchRollToFixedFrame(position, hpr, viewer.scene.globe.ellipsoid, Transforms.LocalFrameToFixedFrame);
-            ret = viewer.scene.primitives.add(Model.fromGltf({
+            const modelMatrix = Cesium.Transforms.headingPitchRollToFixedFrame(position, hpr, viewer.scene.globe.ellipsoid, Cesium.Transforms.LocalFrameToFixedFrame);
+            ret = viewer.scene.primitives.add(Cesium.Model.fromGltf({
                 url: url,
                 modelMatrix: modelMatrix,
                 minimumPixelSize: minimumPixelSize,
@@ -120,27 +90,27 @@ export class CesiumUtil {
     /**
      * 移动GLTF模型。
      *
-     * @param {Viewer} viewer Cesium视窗。
+     * @param {Cesium.Viewer} viewer Cesium视窗。
      */
     static moveGltf(viewer) {
-        const handler = new ScreenSpaceEventHandler(viewer.canvas);
+        const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
         let pickedObject = null;
         let leftDownFlag = false;
 
         handler.setInputAction(function (movement) {
             pickedObject = viewer.scene.pick(movement.position);
-            if (defined(pickedObject) && pickedObject.primitive instanceof Model) {
+            if (Cesium.defined(pickedObject) && pickedObject.primitive instanceof Cesium.Model) {
                 leftDownFlag = true;
                 document.body.style.cursor = 'move';
                 viewer.scene.screenSpaceCameraController.enableRotate = false; // 锁定相机
-                pickedObject.primitive.color = new Color(1, 1, 1, .5); // 选中模型后高亮
+                pickedObject.primitive.color = new Cesium.Color(1, 1, 1, .5); // 选中模型后高亮
                 pickedObject.primitive.silhouetteSize = 3.0; // 选中模型后高亮
             }
-        }, ScreenSpaceEventType.LEFT_DOWN);
+        }, Cesium.ScreenSpaceEventType.LEFT_DOWN);
 
         handler.setInputAction(function () {
-            if (defined(pickedObject) && pickedObject.primitive instanceof Model) {
-                pickedObject.primitive.color = new Color(1, 1, 1, 1);
+            if (Cesium.defined(pickedObject) && pickedObject.primitive instanceof Cesium.Model) {
+                pickedObject.primitive.color = new Cesium.Color(1, 1, 1, 1);
                 pickedObject.primitive.silhouetteSize = 0;
                 leftDownFlag = false;
                 pickedObject = null;
@@ -148,41 +118,41 @@ export class CesiumUtil {
                 handler.destroy(); // 销毁左键监听事件
                 document.body.style.cursor = 'default';
             }
-        }, ScreenSpaceEventType.LEFT_UP);
+        }, Cesium.ScreenSpaceEventType.LEFT_UP);
 
         handler.setInputAction((movement) => {
-            if (leftDownFlag && defined(pickedObject) && pickedObject.primitive instanceof Model && pickedObject.primitive.modelMatrix) {
+            if (leftDownFlag && Cesium.defined(pickedObject) && pickedObject.primitive instanceof Cesium.Model && pickedObject.primitive.modelMatrix) {
                 const ray = viewer.camera.getPickRay(movement.endPosition);
                 const cartesian = viewer.scene.globe.pick(ray, viewer.scene);
-                const headingPitchRoll = Transforms.fixedFrameToHeadingPitchRoll(pickedObject.primitive.modelMatrix, Ellipsoid.WGS84, Transforms.eastNorthUpToFixedFrame);
-                Transforms.headingPitchRollToFixedFrame(cartesian, headingPitchRoll, Ellipsoid.WGS84, Transforms.eastNorthUpToFixedFrame, pickedObject.primitive.modelMatrix);
+                const headingPitchRoll = Cesium.Transforms.fixedFrameToHeadingPitchRoll(pickedObject.primitive.modelMatrix, Cesium.Ellipsoid.WGS84, Cesium.Transforms.eastNorthUpToFixedFrame);
+                Cesium.Transforms.headingPitchRollToFixedFrame(cartesian, headingPitchRoll, Cesium.Ellipsoid.WGS84, Cesium.Transforms.eastNorthUpToFixedFrame, pickedObject.primitive.modelMatrix);
             }
-        }, ScreenSpaceEventType.MOUSE_MOVE);
+        }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
     }
 
     /**
      * 选择GLTF模型。
      *
-     * @param {Viewer} viewer Cesium视窗。
+     * @param {Cesium.Viewer} viewer Cesium视窗。
      * @param {function} callback 回调函数。
      */
     static selectGltf(viewer, callback) {
-        const handler = new ScreenSpaceEventHandler(viewer.canvas);
+        const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
         handler.setInputAction(function (movement) {
             const pickedObject = viewer.scene.pick(movement.position);
-            if (defined(pickedObject) && !pickedObject.primitive.isCesium3DTileset) {
+            if (Cesium.defined(pickedObject) && !pickedObject.primitive.isCesium3DTileset) {
                 document.body.style.cursor = 'pointer';
-                pickedObject.primitive.color = new Color(1, 1, 1, .5); // 选中模型后高亮
+                pickedObject.primitive.color = new Cesium.Color(1, 1, 1, .5); // 选中模型后高亮
                 pickedObject.primitive.silhouetteSize = 3.0; // 选中模型后高亮
                 setTimeout(() => {
                     document.body.style.cursor = 'default';
-                    pickedObject.primitive.color = new Color(1, 1, 1, 1);
+                    pickedObject.primitive.color = new Cesium.Color(1, 1, 1, 1);
                     pickedObject.primitive.silhouetteSize = 0;
                     handler.destroy();
                 }, 500);
                 typeof callback === 'function' && callback(pickedObject);
             }
-        }, ScreenSpaceEventType.LEFT_CLICK);
+        }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
     }
 
     //#endregion
@@ -203,7 +173,7 @@ export class CesiumUtil {
             const primitive = collection.get(i);
             if (primitive[fieldName] === fieldValue) {
                 result = primitive;
-            } else if (primitive instanceof PrimitiveCollection) {
+            } else if (primitive instanceof Cesium.PrimitiveCollection) {
                 // 如果图元类型为集合，则进行递归。
                 result = this.getPrimitiveByField(primitive, fieldValue, fieldName);
             }
@@ -241,20 +211,20 @@ export class CesiumUtil {
         if (options) {
             let modelMatrix;
             if (options.position) {
-                modelMatrix = Transforms.eastNorthUpToFixedFrame(this.getCesiumPosition(options.position));
-                Matrix4.multiplyByMatrix3(modelMatrix, Matrix3.fromHeadingPitchRoll(HeadingPitchRoll.fromDegrees(options.heading ?? 0, options.pitch ?? 0, options.roll ?? 0)), modelMatrix);
+                modelMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(this.getCesiumPosition(options.position));
+                Cesium.Matrix4.multiplyByMatrix3(modelMatrix, Cesium.Matrix3.fromHeadingPitchRoll(Cesium.HeadingPitchRoll.fromDegrees(options.heading ?? 0, options.pitch ?? 0, options.roll ?? 0)), modelMatrix);
             }
             const data = {
                 geometryInstances: [
-                    new GeometryInstance({
+                    new Cesium.GeometryInstance({
                         geometry: options.geometry
                         /*attributes: {
                             color: ColorGeometryInstanceAttribute.fromColor(Color.fromCssColorString(options.color))
                         }*/
                     })
                 ],
-                appearance: new MaterialAppearance({
-                    material: options.material || new Material({
+                appearance: new Cesium.MaterialAppearance({
+                    material: options.material || new Cesium.Material({
                         fabric: {
                             type: 'Color',
                             uniforms: {
@@ -274,9 +244,9 @@ export class CesiumUtil {
             };
             let primitive;
             if (options.geometryType === 'polyline') {
-                primitive = options.clampToGround ? new GroundPolylinePrimitive(data) : new Primitive(data);
+                primitive = options.clampToGround ? new Cesium.GroundPolylinePrimitive(data) : new Cesium.Primitive(data);
             } else {
-                primitive = options.clampToGround ? new GroundPrimitive(data) : new Primitive(data);
+                primitive = options.clampToGround ? new Cesium.GroundPrimitive(data) : new Cesium.Primitive(data);
             }
 
             // 自定义属性
@@ -300,7 +270,7 @@ export class CesiumUtil {
     /**
      * 开启动画。
      *
-     * @param {Viewer} viewer 三维视窗
+     * @param {Cesium.Viewer} viewer 三维视窗
      */
     static startAnimation(viewer) {
         viewer.clock.shouldAnimate = true; // 启动
@@ -309,7 +279,7 @@ export class CesiumUtil {
     /**
      * 停止动画。
      *
-     * @param {Viewer} viewer 三维视窗
+     * @param {Cesium.Viewer} viewer 三维视窗
      */
     static stopAnimation(viewer) {
         viewer.clock.shouldAnimate = false; // 停止
@@ -318,26 +288,26 @@ export class CesiumUtil {
     /**
      * 重置时间轴。
      *
-     * @param {Viewer} viewer 三维视窗
+     * @param {Cesium.Viewer} viewer 三维视窗
      */
     static resetAnimation(viewer) {
-        viewer.clockViewModel.currentTime = JulianDate.fromDate(new Date());
+        viewer.clockViewModel.currentTime = Cesium.JulianDate.fromDate(new Date());
     }
 
     /**
      * 设置时间轴。
      *
-     * @param {Viewer} viewer 三维视窗。
+     * @param {Cesium.Viewer} viewer 三维视窗。
      * @param {JulianDate|Date|string} date 时间。
      */
     static setAnimationTime(viewer, date) {
         let julianDate;
         if (typeof date === 'string') {
-            julianDate = JulianDate.fromDate(new Date(date));
+            julianDate = Cesium.JulianDate.fromDate(new Date(date));
         } else {
             if (date instanceof Date) {
-                julianDate = JulianDate.fromDate(date);
-            } else if (date instanceof JulianDate) {
+                julianDate = Cesium.JulianDate.fromDate(date);
+            } else if (date instanceof Cesium.JulianDate) {
                 julianDate = date;
             }
         }
@@ -349,13 +319,39 @@ export class CesiumUtil {
     //#region 转换
 
     /**
+     * 屏幕坐标转世界坐标。
+     *
+     * @param scene 三维场景。
+     * @param windowCoordinates 屏幕坐标。
+     * @param [result] 返回值。
+     */
+    static cartesian2ToCartesian3(scene, windowCoordinates, result) {
+        let pick;
+        if (windowCoordinates instanceof Cesium.Cartesian2) {
+            pick = windowCoordinates;
+        } else if (windowCoordinates instanceof Array) {
+            pick = Cesium.Cartesian2.fromArray(windowCoordinates);
+        }
+        if (scene.pickPositionSupported) {
+            const ray = scene.camera.getPickRay(pick);
+            if (Cesium.defined(ray)) {
+                result = scene.globe.pick(ray, scene, result);
+                if (!result) {
+                    result = scene.camera.pickEllipsoid(pick, scene.globe.ellipsoid, result);
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
      * 世界坐标转经纬度坐标。
      *
      * @param worldCoordinates 世界坐标。
      * @param [ellipsoid] 空间参考椭球。
      */
     static cartesian3ToDegrees(worldCoordinates, ellipsoid) {
-        const cartographic = Cartographic.fromCartesian(worldCoordinates, ellipsoid);
+        const cartographic = Cesium.Cartographic.fromCartesian(worldCoordinates, ellipsoid);
         return [Math.toDegrees(cartographic.longitude), Math.toDegrees(cartographic.latitude), cartographic.height];
     }
 
@@ -366,19 +362,19 @@ export class CesiumUtil {
      * @return {Color} Cesium颜色对象。
      */
     static getCesiumColor(color) {
-        let result = Color.WHITE;
-        if (color instanceof Color) {
+        let result = Cesium.Color.WHITE;
+        if (color instanceof Cesium.Color) {
             result = color;
         } else if (typeof color === 'string') {
             if (color?.toLowerCase() === 'random') {
-                result = Color.fromRandom();
+                result = Cesium.Color.fromRandom();
             } else if (color?.toLowerCase() === 'transparent') {
-                result = Color.TRANSPARENT;
+                result = Cesium.Color.TRANSPARENT;
             } else {
-                result = Color.fromCssColorString(color);
+                result = Cesium.Color.fromCssColorString(color);
             }
         }
-        !result && (result = Color.WHITE);
+        !result && (result = Cesium.Color.WHITE);
         return result;
     }
 
@@ -390,13 +386,13 @@ export class CesiumUtil {
      */
     static getCesiumPosition(position) {
         let result;
-        if (position instanceof Cartesian3) {
+        if (position instanceof Cesium.Cartesian3) {
             result = position;
-        } else if (position instanceof Cartographic) {
-            result = Cartographic.toCartesian(position);
+        } else if (position instanceof Cesium.Cartographic) {
+            result = Cesium.Cartographic.toCartesian(position);
         } else if (position instanceof Array && position.length >= 0) {
-            result = Cartesian3.fromDegrees(position[0], position[1], position[2]);
-        } else if (position instanceof SampledPositionProperty || position instanceof CallbackProperty) {
+            result = Cesium.Cartesian3.fromDegrees(position[0], position[1], position[2]);
+        } else if (position instanceof Cesium.SampledPositionProperty || position instanceof Cesium.CallbackProperty) {
             result = position;
         }
         return result;
@@ -405,17 +401,17 @@ export class CesiumUtil {
     /**
      * 改变坐标点的高度。
      *
-     * @param {Cartesian3} position 笛卡尔坐标点。
+     * @param {Cesium.Cartesian3} position 笛卡尔坐标点。
      * @param {number} height 高度。
      * @param {boolean} [add] 是否新增高度，而不是替换。
-     * @param {Ellipsoid} [ellipsoid] 椭球。
-     * @return {Cartesian3} 新的坐标点（注意：原坐标点不变）。
+     * @param {Cesium.Ellipsoid} [ellipsoid] 椭球。
+     * @return {Cesium.Cartesian3} 新的坐标点（注意：原坐标点不变）。
      */
-    static changeHeight(position, height, add = false, ellipsoid = Ellipsoid.WGS84) {
-        if (defined(position)) {
-            const oldCartographic = Cartographic.fromCartesian(position); // 高度调整前的弧度坐标
-            const newCartographic = new Cartographic(oldCartographic.longitude, oldCartographic.latitude, add ? oldCartographic.height + height : height); // 高度调整后的弧度坐标
-            return ellipsoid.cartographicToCartesian(newCartographic);
+    static changeHeight(position, height, add = false, ellipsoid = Cesium.Ellipsoid.WGS84) {
+        if (Cesium.defined(position)) {
+            const oldCartographic = Cesium.Cartographic.fromCartesian(position); // 高度调整前的弧度坐标
+            const newCartographic = new Cesium.Cartographic(oldCartographic.longitude, oldCartographic.latitude, add ? oldCartographic.height + height : height); // 高度调整后的弧度坐标
+            return Cesium.Ellipsoid.cartographicToCartesian(newCartographic);
         }
     }
 
@@ -431,13 +427,13 @@ export class CesiumUtil {
      * @return 返回平移后的坐标。
      */
     static translate(position, distanceArr) {
-        const startWorldMatrix = Transforms.eastNorthUpToFixedFrame(position);
-        const translationMatrix = new Matrix4();
-        const resultMatrix = new Matrix4();
-        Matrix4.setTranslation(Matrix4.IDENTITY, new Cartesian3(distanceArr[0] ?? 0, distanceArr[1] ?? 0, distanceArr[2] ?? 0), translationMatrix);
-        Matrix4.multiply(startWorldMatrix, translationMatrix, resultMatrix);
-        const result = new Cartesian3();
-        Matrix4.getTranslation(resultMatrix, result);
+        const startWorldMatrix = Cesium.Transforms.eastNorthUpToFixedFrame(position);
+        const translationMatrix = new Cesium.Matrix4();
+        const resultMatrix = new Cesium.Matrix4();
+        Cesium.Matrix4.setTranslation(Cesium.Matrix4.IDENTITY, new Cesium.Cartesian3(distanceArr[0] ?? 0, distanceArr[1] ?? 0, distanceArr[2] ?? 0), translationMatrix);
+        Cesium.Matrix4.multiply(startWorldMatrix, translationMatrix, resultMatrix);
+        const result = new Cesium.Cartesian3();
+        Cesium.Matrix4.getTranslation(resultMatrix, result);
         return result;
     }
 
@@ -448,7 +444,7 @@ export class CesiumUtil {
     /**
      * 切换二三维模式。
      *
-     * @param {Viewer} viewer Cesium查看器
+     * @param {Cesium.Viewer} viewer Cesium查看器
      * @param {SceneMode|string|number} mode 模式：25d或1，2d或2，3d或3
      */
     static changeSceneMode(viewer, mode) {
@@ -457,20 +453,20 @@ export class CesiumUtil {
         */
 
         /** @type {SceneMode} */
-        let sceneMode = SceneMode.SCENE3D;
+        let sceneMode = Cesium.SceneMode.SCENE3D;
         if (mode) {
             if (mode === '25d') {
-                sceneMode = SceneMode.COLUMBUS_VIEW; //1
+                sceneMode = Cesium.SceneMode.COLUMBUS_VIEW; //1
             } else if (mode === '2d') {
-                sceneMode = SceneMode.SCENE2D; //2
+                sceneMode = Cesium.SceneMode.SCENE2D; //2
             } else if (mode === '3d') {
-                sceneMode = SceneMode.SCENE3D; //3
+                sceneMode = Cesium.SceneMode.SCENE3D; //3
             } else {
                 sceneMode = mode;
             }
         } else {
             const currentMode = viewer.scene.mode;
-            const modes = [SceneMode.COLUMBUS_VIEW, SceneMode.SCENE2D, SceneMode.SCENE3D];
+            const modes = [Cesium.SceneMode.COLUMBUS_VIEW, Cesium.SceneMode.SCENE2D, Cesium.SceneMode.SCENE3D];
             for (let i = 0; i < modes.length; i++) {
                 const m = modes[i];
                 if (m === currentMode) {
@@ -484,11 +480,11 @@ export class CesiumUtil {
             }
         }
 
-        if (sceneMode === SceneMode.COLUMBUS_VIEW) {
+        if (sceneMode === Cesium.SceneMode.COLUMBUS_VIEW) {
             viewer.scene.morphToColumbusView(0);
-        } else if (sceneMode === SceneMode.SCENE2D) {
+        } else if (sceneMode === Cesium.SceneMode.SCENE2D) {
             const cartographic = viewer.scene.camera.positionCartographic;
-            let position = viewer.camera.pickEllipsoid(new Cartesian2(viewer.canvas.clientWidth / 2, viewer.canvas.clientHeight / 2));
+            let position = viewer.camera.pickEllipsoid(new Cesium.Cartesian2(viewer.canvas.clientWidth / 2, viewer.canvas.clientHeight / 2));
             position = this.changeHeight(position, cartographic.height);
 
             viewer.scene.morphTo2D(0);
@@ -504,10 +500,10 @@ export class CesiumUtil {
             setTimeout(() => {
                 viewer.camera.setView({
                     destination: position,
-                    orientation: new HeadingPitchRoll(viewer.scene.camera.heading, viewer.scene.camera.pitch, viewer.scene.camera.roll)
+                    orientation: new Cesium.HeadingPitchRoll(viewer.scene.camera.heading, viewer.scene.camera.pitch, viewer.scene.camera.roll)
                 });
             }, 300);
-        } else if (sceneMode === SceneMode.SCENE3D) {
+        } else if (sceneMode === Cesium.SceneMode.SCENE3D) {
             // 二维切三维无法定位，故取消动画效果
             viewer.scene.morphTo3D(0);
         }
@@ -523,33 +519,32 @@ export class CesiumUtil {
      */
     static getCameraInfo(camera, lineBreak = '\n') {
         let text = '';
-        text += 'longitude: ' + CesiumMath.toDegrees(camera.positionCartographic.longitude) + ',' + lineBreak;
-        text += 'latitude: ' + CesiumMath.toDegrees(camera.positionCartographic.latitude) + ',' + lineBreak;
+        text += 'longitude: ' + Cesium.Math.toDegrees(camera.positionCartographic.longitude) + ',' + lineBreak;
+        text += 'latitude: ' + Cesium.Math.toDegrees(camera.positionCartographic.latitude) + ',' + lineBreak;
         text += 'height: ' + camera.positionCartographic.height + ',' + lineBreak;
-        text += 'heading: ' + CesiumMath.toDegrees(camera.heading) + ',' + lineBreak;
-        text += 'pitch: ' + CesiumMath.toDegrees(camera.pitch) + ',' + lineBreak;
-        text += 'roll: ' + CesiumMath.toDegrees(camera.roll) + ',' + lineBreak;
+        text += 'heading: ' + Cesium.Math.toDegrees(camera.heading) + ',' + lineBreak;
+        text += 'pitch: ' + Cesium.Math.toDegrees(camera.pitch) + ',' + lineBreak;
+        text += 'roll: ' + Cesium.Math.toDegrees(camera.roll) + ',' + lineBreak;
         return text;
     }
 
     /**
      * 点击拾取坐标信息。
      *
-     * @param {Viewer} viewer 三维视窗。
+     * @param {Cesium.Viewer} viewer 三维视窗。
      * @param {function} callback 回调函数。
      */
     static pickPoint(viewer, callback) {
-        const handler = new ScreenSpaceEventHandler(viewer.canvas);
+        const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
         handler.setInputAction((movement) => {
             handler.destroy();
             typeof callback === 'function' && callback(viewer.scene.pickPosition(movement.position));
-        }, ScreenSpaceEventType.LEFT_CLICK);
+        }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
     }
 
     //#endregion
 
     //#region 着色器
-
 
     /**
      * 模型压平。
@@ -564,10 +559,10 @@ export class CesiumUtil {
         // 如果是GLTF模型，则设置为模型的中心。
         // const center = tileset.boundingSphere.center;
         const center = this.getCesiumPosition(options.position || [121.49515381925019, 31.241921435952527, 20]);
-        const modelCenterMat = new Matrix4();
-        const inverseModelCenterMat = new Matrix4();
-        Transforms.eastNorthUpToFixedFrame(center, viewer.scene.globe.ellipsoid, modelCenterMat);
-        Matrix4.inverse(modelCenterMat, inverseModelCenterMat);
+        const modelCenterMat = new Cesium.Matrix4();
+        const inverseModelCenterMat = new Cesium.Matrix4();
+        Cesium.Transforms.eastNorthUpToFixedFrame(center, viewer.scene.globe.ellipsoid, modelCenterMat);
+        Cesium.Matrix4.inverse(modelCenterMat, inverseModelCenterMat);
         const flatteningHeight = options.flatteningHeight ?? 0;
         let vertexShaderText;
         let fragmentShaderText;
@@ -623,7 +618,7 @@ export class CesiumUtil {
                         // 模型渐变
                         float helsing_colorDepth = 20.0;          
                         float helsing_lineHeight = 500.0;
-                        // material.diffuse *= vec3(modelPosition.z / helsing_colorDepth);
+                        material.diffuse *= vec3(modelPosition.z / helsing_colorDepth);
                         
                         // 发光线
                         float helsing_diff = step(0.005, abs(clamp(worldPosition.z / helsing_lineHeight, 0.0, 1.0) - helsing_frame));
@@ -637,27 +632,27 @@ export class CesiumUtil {
                 break;
         }
 
-        tileset.customShader = new CustomShader({
+        tileset.customShader = new Cesium.CustomShader({
             // lightingModel: LightingModel.UNLIT,
             uniforms: {
                 u_flatteningHeight: {
-                    type: UniformType.FLOAT,
+                    type: Cesium.UniformType.FLOAT,
                     value: flatteningHeight
                 },
                 u_modelCenterMat: {
-                    type: UniformType.MAT4,
+                    type: Cesium.UniformType.MAT4,
                     value: modelCenterMat
                 },
                 u_inverseModelCenterMat: {
-                    type: UniformType.MAT4,
+                    type: Cesium.UniformType.MAT4,
                     value: inverseModelCenterMat
                 },
                 u_drag: {
-                    type: UniformType.VEC2,
-                    value: new Cartesian2(0.0, 0.0)
+                    type: Cesium.UniformType.VEC2,
+                    value: new Cesium.Cartesian2(0.0, 0.0)
                 },
                 u_time: {
-                    type: UniformType.FLOAT,
+                    type: Cesium.UniformType.FLOAT,
                     value: 0
                 }
             },
@@ -747,8 +742,8 @@ export class CesiumUtil {
 
         if (type === 'explode') {
             let dragActive = false;
-            const dragCenter = new Cartesian2();
-            const scratchDrag = new Cartesian2();
+            const dragCenter = new Cesium.Cartesian2();
+            const scratchDrag = new Cesium.Cartesian2();
             const startTime = performance.now();
 
             viewer.screenSpaceEventHandler.setInputAction((movement) => {
@@ -762,12 +757,12 @@ export class CesiumUtil {
                 // set the new drag center
                 dragActive = true;
                 movement.position.clone(dragCenter);
-            }, ScreenSpaceEventType.LEFT_DOWN);
+            }, Cesium.ScreenSpaceEventType.LEFT_DOWN);
 
             viewer.screenSpaceEventHandler.setInputAction((movement) => {
                 if (dragActive) {
                     // get the mouse position relative to the center of the screen
-                    const drag = Cartesian3.subtract(
+                    const drag = Cesium.Cartesian3.subtract(
                         movement.endPosition,
                         dragCenter,
                         scratchDrag
@@ -776,12 +771,12 @@ export class CesiumUtil {
                     // Update uniforms
                     tileset.customShader.setUniform('u_drag', drag);
                 }
-            }, ScreenSpaceEventType.MOUSE_MOVE);
+            }, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
 
             viewer.screenSpaceEventHandler.setInputAction(() => {
                 viewer.scene.screenSpaceCameraController.enableInputs = true;
                 dragActive = false;
-            }, ScreenSpaceEventType.LEFT_UP);
+            }, Cesium.ScreenSpaceEventType.LEFT_UP);
 
             viewer.scene.postUpdate.addEventListener(() => {
                 const elapsedTimeSeconds = (performance.now() - startTime) / 1000;

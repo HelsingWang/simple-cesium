@@ -1,28 +1,16 @@
-import {
-    defined,
-    defaultValue,
-    destroyObject,
-    DeveloperError,
-    EventHelper,
-    Model,
-    PrimitiveCollection,
-    ScreenSpaceEventHandler,
-    CesiumTerrainProvider,
-    EllipsoidTerrainProvider,
-    IonResource
-} from 'cesium';
+import * as Cesium from 'cesium';
 import knockout from '/node_modules/@cesium/widgets/Source/ThirdParty/knockout';
 
 export class LayerControlViewModel {
     constructor(viewer) {
-        if (!defined(viewer)) {
-            throw new DeveloperError('viewer is required');
+        if (!Cesium.defined(viewer)) {
+            throw new Cesium.DeveloperError('viewer is required');
         }
 
         const that = this;
         const scene = viewer.scene;
         const canvas = scene.canvas;
-        const eventHandler = new ScreenSpaceEventHandler(canvas);
+        const eventHandler = new Cesium.ScreenSpaceEventHandler(canvas);
 
         this._viewer = viewer;
         this._eventHandler = eventHandler;
@@ -37,7 +25,7 @@ export class LayerControlViewModel {
 
 
         Object.assign(this, {
-            'viewerShadows': defaultValue(viewer.shadows, false)
+            'viewerShadows': Cesium.defaultValue(viewer.shadows, false)
         });
         knockout.track(this);
         const props = [
@@ -45,7 +33,7 @@ export class LayerControlViewModel {
         ];
         props.forEach(value => this._subscribe(value[0], value[1], value[2]));
 
-        const helper = new EventHelper();
+        const helper = new Cesium.EventHelper();
         // 底图加载完成后的事件
         helper.add(viewer.scene.globe.tileLoadProgressEvent, function (event) {
             if (event === 0) {
@@ -64,7 +52,7 @@ export class LayerControlViewModel {
             this._subscribes[i].dispose();
             this._subscribes.pop();
         }
-        return destroyObject(this);
+        return Cesium.destroyObject(this);
     }
 
     _update() {
@@ -73,7 +61,7 @@ export class LayerControlViewModel {
 
     _subscribe(name, obj, prop) {
         const that = this;
-        const result = knockout
+        const result = Cesium.knockout
             .getObservable(that, name)
             .subscribe(() => {
                 obj[prop] = that[name];
@@ -92,10 +80,10 @@ export class LayerControlViewModel {
                 if (layer.isCesium3DTileset) {
                     layer.url && (layer.name = layer.url.substring(0, layer.url.lastIndexOf('/'))
                         .replace(/^(.*[\/\\])?(.*)*$/, '$2'));
-                } else if (layer instanceof Model) {
-                    layer._resource && (layer.name = layer._resource.url.replace(/^(.*[\/\\])?(.*)*(\.[^.?]*.*)$/, '$2'));
-                } else if (layer instanceof PrimitiveCollection) {
-                    layer.name = `PrimitiveCollection_${layer._guid}`;
+                } else if (layer instanceof Cesium.Model) {
+                    layer['_resource'] && (layer.name = layer['_resource'].url.replace(/^(.*[\/\\])?(.*)*(\.[^.?]*.*)$/, '$2'));
+                } else if (layer instanceof Cesium.PrimitiveCollection) {
+                    layer.name = `PrimitiveCollection_${layer['_guid']}`;
                 }
             }
             !layer.name && (layer.name = '[未命名]');
@@ -124,7 +112,7 @@ export class LayerControlViewModel {
         for (let i = count - 1; i >= 0; --i) {
             const layer = layers.get(i);
             if (!layer.name) {
-                layer.name = layer.imageryProvider._resource.url;
+                layer.name = layer.imageryProvider['_resource'].url;
             }
             !layer.name && (layer.name = '[未命名]');
             this.imageryLayers.push(layer);
@@ -137,14 +125,14 @@ export class LayerControlViewModel {
         this.terrainLayers.splice(0, this.terrainLayers.length);
         const layer = this._viewer.terrainProvider;
 
-        const realLayers = that._viewer.terrainProvider._layers;
+        const realLayers = that._viewer.terrainProvider['_layers'];
         const realShow = !!(realLayers && realLayers.length > 0);
         if (!layer.name && realShow) {
-            layer.name = realLayers[0].resource._url + realLayers[0].tileUrlTemplates;
+            layer.name = realLayers[0].resource['_url'] + realLayers[0].tileUrlTemplates;
         }
         !layer.name && (layer.name = '[默认地形]');
         // 定义show属性
-        !defined(layer.show) && Object.defineProperties(layer, {
+        !Cesium.defined(layer.show) && Object.defineProperties(layer, {
             show: {
                 get: function () {
                     return realShow;
@@ -157,11 +145,11 @@ export class LayerControlViewModel {
             let terrainProvider;
             if (!layer.show) {
                 // add a simple terain so no terrain shall be preseneted
-                terrainProvider = new EllipsoidTerrainProvider();
+                terrainProvider = new Cesium.EllipsoidTerrainProvider();
             } else {
                 // enable the terain
-                terrainProvider = new CesiumTerrainProvider({
-                    url: IonResource.fromAssetId(3956),//'//cesiumjs.org/stk-terrain/tilesets/world/tiles',
+                terrainProvider = new Cesium.CesiumTerrainProvider({
+                    url: Cesium.IonResource.fromAssetId(3956),//'//cesiumjs.org/stk-terrain/tilesets/world/tiles',
                     requestWaterMask: true
                 });
             }

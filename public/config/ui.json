@@ -211,6 +211,32 @@
       },
       {
         "type": "default",
+        "name": "分析",
+        "desc": "各种分析。",
+        "visible": true,
+        "enabled": true,
+        "checked": false,
+        "checkbox": false,
+        "click": "",
+        "expandOnClick": true,
+        "closeOnClick": true,
+        "more": false,
+        "items": [
+          {
+            "type": "default",
+            "name": "可视域分析",
+            "desc": "可视域分析",
+            "visible": true,
+            "enabled": true,
+            "checked": false,
+            "checkbox": false,
+            "click": "this.map.viewShedAnalyse()",
+            "closeOnClick": true
+          }
+        ]
+      },
+      {
+        "type": "default",
         "name": "测试",
         "desc": "测试专用。",
         "visible": true,

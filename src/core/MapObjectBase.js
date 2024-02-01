@@ -1,4 +1,4 @@
-﻿import {Viewer} from 'cesium';
+﻿import * as Cesium from 'cesium';
 import {ObjectBase} from './ObjectBase';
 import {Util} from '../common/Util';
 
@@ -29,7 +29,7 @@ export class MapObjectBase extends ObjectBase {
     /**
      * 三维视窗。
      *
-     * @type {Viewer}
+     * @type {Cesium.Viewer}
      */
     get viewer() {
         return this.properties?.viewer;
@@ -48,7 +48,7 @@ export class MapObjectBase extends ObjectBase {
     constructor(options = {}) {
         // 兼容 new Class(viewer, options) 传参模式
         let viewer;
-        if (options instanceof Viewer){
+        if (options instanceof Cesium.Viewer){
             viewer = options;
             options =  arguments[1] ?? {};
         }

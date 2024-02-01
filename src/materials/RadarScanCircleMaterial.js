@@ -1,4 +1,4 @@
-import {Material} from 'cesium';
+import * as Cesium from 'cesium';
 import {CesiumUtil} from '../common/CesiumUtil';
 
 /**
@@ -8,7 +8,7 @@ import {CesiumUtil} from '../common/CesiumUtil';
  * @author Helsing
  * @since 2023/11/11
  */
-export class RadarScanCircleMaterial extends Material {
+export class RadarScanCircleMaterial extends Cesium.Material {
     /**
      * 构造雷达扫描材质。
      *

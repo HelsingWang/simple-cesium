@@ -2,7 +2,7 @@
   "name": "simple-cesium",
   "version": "0.0.1",
   "dependencies": {
-    "cesium": "^1.111.0",
+    "cesium": "^1.113.0",
     "cesium-navigation-es6": "^1.1.7",
     "node-polyfill-webpack-plugin": "^2.0.1"
   },

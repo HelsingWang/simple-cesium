@@ -1,9 +1,4 @@
-import {
-    defined,
-    DeveloperError,
-    destroyObject
-} from 'cesium';
-import knockout from '/node_modules/@cesium/widgets/Source/ThirdParty/knockout';
+import * as Cesium from 'cesium';
 import {Util} from '../../common/Util';
 import {MapOptionsViewModel} from './MapOptionsViewModel';
 import MapOptionsHtml from './MapOptions.html';
@@ -34,11 +29,11 @@ export class MapOptions {
         this._viewModel = undefined;
         this._onDestroyListeners = [];
 
-        if (!defined(viewer)) {
-            throw new DeveloperError('viewer is required.');
+        if (!Cesium.defined(viewer)) {
+            throw new Cesium.DeveloperError('viewer is required.');
         }
-        if (!defined(options)) {
-            throw new DeveloperError('container is required.');
+        if (!Cesium.defined(options)) {
+            throw new Cesium.DeveloperError('container is required.');
         }
 
         const that = this;
@@ -62,7 +57,7 @@ export class MapOptions {
         this._container = container;
 
         // 绑定viewModel和element
-        knockout.applyBindings(viewModel, element);
+        Cesium.knockout.applyBindings(viewModel, element);
     }
 
     /**
@@ -77,21 +72,21 @@ export class MapOptions {
      * removing the widget from layout.
      */
     destroy() {
-        if (defined(this._element)) {
-            knockout.cleanNode(this._element);
-            defined(this._container) && this._container.removeChild(this._element);
+        if (Cesium.defined(this._element)) {
+            Cesium.knockout.cleanNode(this._element);
+            Cesium.defined(this._container) && this._container.removeChild(this._element);
         }
         delete this._element;
         delete this._container;
 
-        defined(this._viewModel) && this._viewModel.destroy();
+        Cesium.defined(this._viewModel) && this._viewModel.destroy();
         delete this._viewModel;
 
         for (let i = 0; i < this._onDestroyListeners.length; i++) {
             this._onDestroyListeners[i]();
         }
 
-        return destroyObject(this);
+        return Cesium.destroyObject(this);
     }
 
     addOnDestroyListener(callback) {

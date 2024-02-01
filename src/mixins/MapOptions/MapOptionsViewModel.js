@@ -1,23 +1,17 @@
-import {
-    defined,
-    defaultValue,
-    destroyObject,
-    DeveloperError,
-    ScreenSpaceEventHandler
-} from 'cesium';
+import * as Cesium from 'cesium';
 import knockout from '/node_modules/@cesium/widgets/Source/ThirdParty/knockout';
 
 export class MapOptionsViewModel {
     constructor(viewer) {
-        if (!defined(viewer)) {
-            throw new DeveloperError('viewer is required');
+        if (!Cesium.defined(viewer)) {
+            throw new Cesium.DeveloperError('viewer is required');
         }
 
         const that = this;
         const scene = viewer.scene;
         const globe = scene.globe;
         const canvas = scene.canvas;
-        const eventHandler = new ScreenSpaceEventHandler(canvas);
+        const eventHandler = new Cesium.ScreenSpaceEventHandler(canvas);
 
         this._viewer = viewer;
         this._eventHandler = eventHandler;
@@ -27,21 +21,21 @@ export class MapOptionsViewModel {
         this._subscribes = [];
 
         Object.assign(this, {
-            'viewerShadows': defaultValue(viewer.shadows, false),
-            'globeEnableLighting': defaultValue(globe.enableLighting, false),
-            'globeShowGroundAtmosphere': defaultValue(globe.showGroundAtmosphere, true),
-            'globeTranslucencyEnabled': defaultValue(globe.translucency.enabled, false),
-            'globeShow': defaultValue(globe.show, true),
-            'globeDepthTestAgainstTerrain': defaultValue(globe.depthTestAgainstTerrain, false),
-            'globeWireFrame': defaultValue(globe._surface.tileProvider._debug.wireFrame, false),
-            'sceneSkyAtmosphereShow': defaultValue(scene.skyAtmosphere.show, true),
-            'sceneFogEnabled': defaultValue(scene.fog.enabled, true),
-            'sceneRequestRenderMode': defaultValue(scene.requestRenderMode, false),
-            'sceneLogarithmicDepthBuffer': defaultValue(scene.logarithmicDepthBuffer, false),
-            'sceneDebugShowFramesPerSecond': defaultValue(scene.debugShowFramesPerSecond, false),
-            'sceneDebugShowFrustumPlanes': defaultValue(scene.debugShowFrustumPlanes, false),
-            'sceneEnableCollisionDetection': defaultValue(scene.enableCollisionDetection, false),
-            'sceneBloomEnabled': defaultValue(scene.postProcessStages.bloom.enabled, false)
+            'viewerShadows': Cesium.defaultValue(viewer.shadows, false),
+            'globeEnableLighting': Cesium.defaultValue(globe.enableLighting, false),
+            'globeShowGroundAtmosphere': Cesium.defaultValue(globe.showGroundAtmosphere, true),
+            'globeTranslucencyEnabled': Cesium.defaultValue(globe.translucency.enabled, false),
+            'globeShow': Cesium.defaultValue(globe.show, true),
+            'globeDepthTestAgainstTerrain': Cesium.defaultValue(globe.depthTestAgainstTerrain, false),
+            'globeWireFrame': Cesium.defaultValue(globe._surface.tileProvider._debug.wireFrame, false),
+            'sceneSkyAtmosphereShow': Cesium.defaultValue(scene.skyAtmosphere.show, true),
+            'sceneFogEnabled': Cesium.defaultValue(scene.fog.enabled, true),
+            'sceneRequestRenderMode': Cesium.defaultValue(scene.requestRenderMode, false),
+            'sceneLogarithmicDepthBuffer': Cesium.defaultValue(scene.logarithmicDepthBuffer, false),
+            'sceneDebugShowFramesPerSecond': Cesium.defaultValue(scene.debugShowFramesPerSecond, false),
+            'sceneDebugShowFrustumPlanes': Cesium.defaultValue(scene.debugShowFrustumPlanes, false),
+            'sceneEnableCollisionDetection': Cesium.defaultValue(scene.enableCollisionDetection, false),
+            'sceneBloomEnabled': Cesium.defaultValue(scene.postProcessStages.bloom.enabled, false)
         });
         knockout.track(this);
         /*knockout.track(this, [
@@ -96,7 +90,7 @@ export class MapOptionsViewModel {
             this._subscribes[i].dispose();
             this._subscribes.pop();
         }
-        return destroyObject(this);
+        return Cesium.destroyObject(this);
     }
 
     _update() {
@@ -105,7 +99,7 @@ export class MapOptionsViewModel {
 
     _subscribe(name, obj, prop) {
         const that = this;
-        const result = knockout
+        const result = Cesium.knockout
             .getObservable(that, name)
             .subscribe(() => {
                 obj[prop] = that[name];

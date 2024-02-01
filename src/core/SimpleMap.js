@@ -1,23 +1,14 @@
+import ViewerHtml from './SimpleMap.html';
 import 'cesium/Source/Widgets/widgets.css';
-import {
-    BoundingSphere,
-    Cartesian3,
-    EllipseGeometry,
-    Ion,
-    Math as CesiumMath,
-    Rectangle,
-    RectangleGeometry,
-    Viewer
-} from 'cesium';
-import createOsmBuildingsAsync from '/node_modules/@cesium/engine/Source/Scene/createOsmBuildingsAsync';
+import * as Cesium from 'cesium';
 import viewerCesiumNavigationMixin from 'cesium-navigation-es6/viewerCesiumNavigationMixin';
 import {viewerLayerControlMixin} from '../mixins/LayerControl/viewerLayerControlMixin';
 import {viewerMapOptionsMixin} from '../mixins/MapOptions/viewerMapOptionsMixin';
 import {Util} from '../common/Util';
 import {CesiumUtil} from '../common/CesiumUtil';
 import {ObjectBase} from './ObjectBase';
-import ViewerHtml from './SimpleMap.html';
 import {RadarScanCircleMaterial} from '../materials/RadarScanCircleMaterial';
+//import {ViewShedAnalysis} from '../analysis/viewshed/ViewShedIndex';
 
 /**
  * 地图。
@@ -43,7 +34,7 @@ export class SimpleMap extends ObjectBase {
     /**
      * 三维视窗。
      *
-     * @returns {Viewer}
+     * @returns {Cesium.Viewer}
      */
     get viewer() {
         return this.properties?.viewer;
@@ -63,13 +54,18 @@ export class SimpleMap extends ObjectBase {
         this.init(this.properties.container, options);
     }
 
+    /**
+     * 初始化。
+     *
+     * @param container 地图容器。
+     */
     init(container = 'simpleCesium') {
         if (!container) {
             return;
         }
 
         Util.insertHtml(container, ViewerHtml, async () => {
-            const viewer = new Viewer('cesiumContainer', {
+            const viewer = new Cesium.Viewer('cesiumContainer', {
                 creditContainer: 'creditContainer'
             });
 
@@ -89,7 +85,7 @@ export class SimpleMap extends ObjectBase {
 
             // Load OSM buildings.
             try {
-                const tileset = await createOsmBuildingsAsync();
+                const tileset = await Cesium.createOsmBuildingsAsync();
                 viewer.scene.primitives.add(tileset);
                 tileset['name'] = 'OsmBuildings';
             } catch (error) {
@@ -98,16 +94,16 @@ export class SimpleMap extends ObjectBase {
 
             // Fly to New York.
             viewer.scene.camera.flyTo({
-                destination: Cartesian3.fromDegrees(121.4814, 31.2424, 500),
+                destination: Cesium.Cartesian3.fromDegrees(121.4814, 31.2424, 500),
                 orientation: {
-                    heading: CesiumMath.toRadians(103),
-                    pitch: CesiumMath.toRadians(-12)
+                    heading: Cesium.Math.toRadians(103),
+                    pitch: Cesium.Math.toRadians(-12)
                 }
             });
 
             // Set imagery source to ArcGIS World Imagery.
             viewer.baseLayerPicker.viewModel.selectedImagery = viewer.baseLayerPicker.viewModel.imageryProviderViewModels[3];
-            Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzNWZjMjczZi00YzgxLTRlNGYtODVhMi1lNjhlNWU4OGQwMmYiLCJpZCI6MTUzNjYsImlhdCI6MTYwNjcwMzA0OH0.PJbk3DIs2DJIwP7KvWe6Z8a7aZOygIHQ1qIVjLtlQeI';
+            Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzNWZjMjczZi00YzgxLTRlNGYtODVhMi1lNjhlNWU4OGQwMmYiLCJpZCI6MTUzNjYsImlhdCI6MTYwNjcwMzA0OH0.PJbk3DIs2DJIwP7KvWe6Z8a7aZOygIHQ1qIVjLtlQeI';
 
             // Load mixins。
             viewer.extend(viewerCesiumNavigationMixin, {});
@@ -210,7 +206,7 @@ export class SimpleMap extends ObjectBase {
         const zoomTo = options.zoomTo ?? false;
         CesiumUtil.addSimplePrimitiveFeature(this.viewer.scene.primitives, {
             name: name,
-            geometry: new RectangleGeometry({
+            geometry: new Cesium.RectangleGeometry({
                 rectangle: Rectangle.fromCartesianArray([
                     CesiumUtil.translate(position, [-radius, radius, 0]),
                     CesiumUtil.translate(position, [radius, -radius, 0])
@@ -221,7 +217,7 @@ export class SimpleMap extends ObjectBase {
                 type: type
             })
         });
-        zoomTo && this.viewer.camera.flyToBoundingSphere(new BoundingSphere(position, radius * 1.5));
+        zoomTo && this.viewer.camera.flyToBoundingSphere(new Cesium.BoundingSphere(position, radius * 1.5));
     }
 
     /**
@@ -237,18 +233,18 @@ export class SimpleMap extends ObjectBase {
         const zoomTo = options.zoomTo ?? false;
         CesiumUtil.addSimplePrimitiveFeature(this.viewer.scene.primitives, {
             name: name,
-            geometry: new EllipseGeometry({
+            geometry: new Cesium.EllipseGeometry({
                 center: position,
                 semiMajorAxis: radius,
                 semiMinorAxis: radius,
-                rotation: CesiumMath.toRadians(60.0)
+                rotation: Cesium.Math.toRadians(60.0)
             }),
             material: new RadarScanCircleMaterial({
                 ...options,
                 type: type
             })
         });
-        zoomTo && this.viewer.camera.flyToBoundingSphere(new BoundingSphere(position, radius * 1.5));
+        zoomTo && this.viewer.camera.flyToBoundingSphere(new Cesium.BoundingSphere(position, radius * 1.5));
     }
 
     //#endregion
@@ -520,7 +516,18 @@ export class SimpleMap extends ObjectBase {
 
     //#endregion
 
+    //#region 分析
+
+    viewShedAnalyse(){
+        //TODO:可视域分析
+        //ViewShedAnalysis(this.viewer);
+    }
+
     //#endregion
+
+    //#endregion
+
+    //#region 测试
 
     test() {
         /*this.rectMaterial({
@@ -596,4 +603,6 @@ export class SimpleMap extends ObjectBase {
             offset: 0.2
         });
     }
+
+    //#endregion
 }

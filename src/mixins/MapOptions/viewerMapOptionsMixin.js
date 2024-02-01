@@ -1,7 +1,4 @@
-import {
-    defined,
-    DeveloperError
-} from 'cesium';
+import * as Cesium from 'cesium';
 import {MapOptions} from './MapOptions';
 import './MapOptions.css';
 
@@ -20,8 +17,8 @@ import './MapOptions.css';
  * viewer.extend(viewerMapOptionsMixin);
  */
 export function viewerMapOptionsMixin(viewer, options = {}) {
-    if (!defined(viewer)) {
-        throw new DeveloperError('viewer is required.');
+    if (!Cesium.defined(viewer)) {
+        throw new Cesium.DeveloperError('viewer is required.');
     }
 
     const container = document.createElement('div');
@@ -35,7 +32,7 @@ export function viewerMapOptionsMixin(viewer, options = {}) {
     // Remove the mapOptions property from viewer.
     widget.addOnDestroyListener((function (viewer) {
         return function () {
-            defined(container) && container.parentNode.removeChild(container);
+            Cesium.defined(container) && container.parentNode.removeChild(container);
             delete viewer.scMapOptions;
         };
     })(viewer));
