@@ -203,11 +203,11 @@ export class SimpleMap extends ObjectBase {
         const radius = options.radius ?? 40000.0;
         const name = options.name || '矩形材质';
         const type = options.type ?? 0.0;
-        const zoomTo = options.zoomTo ?? false;
+        const zoomTo = options.zoomTo ?? true;
         CesiumUtil.addSimplePrimitiveFeature(this.viewer.scene.primitives, {
             name: name,
             geometry: new Cesium.RectangleGeometry({
-                rectangle: Rectangle.fromCartesianArray([
+                rectangle: Cesium.Rectangle.fromCartesianArray([
                     CesiumUtil.translate(position, [-radius, radius, 0]),
                     CesiumUtil.translate(position, [radius, -radius, 0])
                 ])
@@ -230,7 +230,7 @@ export class SimpleMap extends ObjectBase {
         const radius = options.radius ?? 40000.0;
         const name = options.name || '圆形材质';
         const type = options.type ?? 0.0;
-        const zoomTo = options.zoomTo ?? false;
+        const zoomTo = options.zoomTo ?? true;
         CesiumUtil.addSimplePrimitiveFeature(this.viewer.scene.primitives, {
             name: name,
             geometry: new Cesium.EllipseGeometry({
