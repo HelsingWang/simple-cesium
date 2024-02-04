@@ -352,7 +352,7 @@ export class CesiumUtil {
      */
     static cartesian3ToDegrees(worldCoordinates, ellipsoid) {
         const cartographic = Cesium.Cartographic.fromCartesian(worldCoordinates, ellipsoid);
-        return [Math.toDegrees(cartographic.longitude), Math.toDegrees(cartographic.latitude), cartographic.height];
+        return [Cesium.Math.toDegrees(cartographic.longitude), Cesium.Math.toDegrees(cartographic.latitude), cartographic.height];
     }
 
     /**

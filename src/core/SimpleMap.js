@@ -8,7 +8,7 @@ import {Util} from '../common/Util';
 import {CesiumUtil} from '../common/CesiumUtil';
 import {ObjectBase} from './ObjectBase';
 import {RadarScanCircleMaterial} from '../materials/RadarScanCircleMaterial';
-//import {ViewShedAnalysis} from '../analysis/viewshed/ViewShedIndex';
+import {Test} from '../test/Test';
 
 /**
  * 地图。
@@ -18,6 +18,9 @@ import {RadarScanCircleMaterial} from '../materials/RadarScanCircleMaterial';
  * @class
  * @extends ObjectBase
  * @example
+ * ````
+ * const map = new SimpleMap('simpleCesium', {});
+ * ````
  * @author Helsing
  * @since 2020/12/30
  */
@@ -41,6 +44,14 @@ export class SimpleMap extends ObjectBase {
     }
 
     /**
+     * 测试。
+     *
+     * @type {Test}
+     * @private
+     */
+    _test;
+
+    /**
      * 构造地图。
      *
      * @param container 地图容器。
@@ -51,15 +62,13 @@ export class SimpleMap extends ObjectBase {
 
         this.properties.viewer = undefined;
         this.properties.container = Util.getElement(container);
-        this.init(this.properties.container, options);
     }
 
     /**
-     * 初始化。
-     *
-     * @param container 地图容器。
+     * 启动地图。
      */
-    init(container = 'simpleCesium') {
+    startUp() {
+        const container = this.properties.container;
         if (!container) {
             return;
         }
@@ -111,7 +120,21 @@ export class SimpleMap extends ObjectBase {
             // viewer.extend(viewerMapOptionsMixin);
 
             this.properties.viewer = viewer;
+
+            // 测试。
+            this._test = new Test({map: this});
         });
+    }
+
+    /**
+     * 销毁地图。
+     */
+    destroy(){
+        this.properties.viewer?.destroy();
+        this.properties.viewer = null;
+        this._test = null;
+        this.options = null;
+        this.properties = null;
     }
 
     //#region 公共函数
@@ -499,7 +522,7 @@ export class SimpleMap extends ObjectBase {
         CesiumUtil.customShader({
             type: 'explode',
             viewer: this.viewer,
-            tileset: CesiumUtil.getPrimitiveByField(this.viewer.scene.primitives, 'OsmBuildings'),
+            tileset: CesiumUtil.getPrimitiveByField(this.viewer.scene.primitives, 'OsmBuildings')
         });
     }
 
@@ -510,7 +533,7 @@ export class SimpleMap extends ObjectBase {
         CesiumUtil.customShader({
             type: 'render',
             viewer: this.viewer,
-            tileset: CesiumUtil.getPrimitiveByField(this.viewer.scene.primitives, 'OsmBuildings'),
+            tileset: CesiumUtil.getPrimitiveByField(this.viewer.scene.primitives, 'OsmBuildings')
         });
     }
 
@@ -518,7 +541,7 @@ export class SimpleMap extends ObjectBase {
 
     //#region 分析
 
-    viewShedAnalyse(){
+    viewShedAnalyse() {
         //TODO:可视域分析
         //ViewShedAnalysis(this.viewer);
     }
@@ -530,78 +553,7 @@ export class SimpleMap extends ObjectBase {
     //#region 测试
 
     test() {
-        /*this.rectMaterial({
-            name: 'x轴向渐变矩形材质',
-            type: 1.1,
-            position:[80, 39],
-            zoomTo: true
-        })
-        this.rectMaterial({
-            name: 'y轴向渐变矩形材质',
-            position:[81, 39],
-            type: 1.2,
-        })
-        this.rectMaterial({
-            name: '中心向外渐变矩形材质',
-            position:[82, 39],
-            type: 2.1,
-        })
-        this.rectMaterial({
-            name: '中心向外渐变矩形材质',
-            position:[83, 39],
-            type: 2.2,
-        })
-        this.rectMaterial({
-            name: '外部向中心渐变矩形材质',
-            position:[84, 39],
-            type: 2.3,
-        })
-        this.rectMaterial({
-            name: '外部向中心渐变矩形材质',
-            position:[85, 39],
-            type: 2.4,
-        })
-        this.circleMaterial({
-            name: 'x轴向渐变矩形材质',
-            type: 1.1,
-            position:[80, 38],
-        })
-        this.circleMaterial({
-            name: 'y轴向渐变矩形材质',
-            position:[81, 38],
-            type: 1.2,
-        })
-        this.circleMaterial({
-            name: '中心向外部渐变矩形材质',
-            position:[82, 38],
-            type: 2.1,
-        })
-        this.circleMaterial({
-            name: '中心向外部渐变矩形材质',
-            position:[83, 38],
-            type: 2.2,
-        })
-        this.circleMaterial({
-            name: '外部向中心渐变矩形材质',
-            position:[84, 38],
-            type: 2.3,
-        })
-        this.circleMaterial({
-            name: '外部向中心渐变矩形材质',
-            position:[85, 38],
-            type: 2.4,
-        })*/
-        this.circleMaterial({
-            name: '雷达扫描',
-            zoomTo: true,
-            position: [85, 38],
-            type: 2.4,
-            color: 'rgb(0,255,50)',
-            backgroundColor: 'rgba(0,255,50,0.2)',
-            sectorColor: 'rgb(0,255,50)',
-            radians: Math.PI * 3 / 8,
-            offset: 0.2
-        });
+        this._test.execute();
     }
 
     //#endregion

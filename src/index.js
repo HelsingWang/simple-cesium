@@ -5,6 +5,7 @@ import {ToolbarWidget} from './widgets/ToolbarWidget';
 
 // startUp
 const map = new SimpleMap();
+map.startUp(map.properties.container);
 Util.get('config/ui.json', function (text) {
     if (text) {
         text = Util.removeComments(text);
