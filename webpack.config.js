@@ -55,6 +55,10 @@ const config = {
                     name: "./Assets/SimpleCesium/[name].[ext]", // 这个路径其实是为了兼容Cesium的资源文件目录
                     limit: 10240 // 超过10K的不转换base64
                 }
+            },
+            {
+                test: /\.(glsl)$/,
+                use: ['raw-loader']
             }
         ]
     },

@@ -265,6 +265,74 @@ export class CesiumUtil {
 
     //#endregion
 
+    //#region PostProcessStage
+
+    /**
+     * 添加后期处理场景。
+     *
+     * @param {Cesium.PostProcessStageCollection} collection 场景集合。
+     * @param {Object} options 选项。
+     * @return {Cesium.PostProcessStage} 后期处理场景。
+     */
+    static addPostProcessStage(collection, options) {
+        if (options) {
+            const stage = new Cesium.PostProcessStage({
+                name: options.name,
+                fragmentShader: options.fragmentShader,
+                uniforms: options.uniforms
+            });
+            // 自定义属性
+            stage.id = options.id || Util.getGuid();
+            stage.desc = options.desc;
+            stage.layerId = options.layerId || 'STAGE_LAYER';
+            stage.layerName = options.layerName || 'StageLayer';
+            stage.layerDesc = options.layerDesc || '后处理场景图层';
+            collection.add(stage);
+            return stage;
+        }
+    }
+
+    /**
+     * 添加后期处理场景。
+     *
+     * @param {Cesium.PostProcessStageCollection} collection 场景集合。
+     * @param {Object} options 选项。
+     * @return {Cesium.PostProcessStageComposite} 后期处理场景。
+     */
+    static addPostProcessStages(collection, options) {
+        if (options) {
+            const stages = options.items.map(item => {
+                const stage = new Cesium.PostProcessStage({
+                    name: item.name,
+                    fragmentShader: item.fragmentShader,
+                    uniforms: item.uniforms
+                });
+                // 自定义属性
+                stage.id = item.id || Util.getGuid();
+                stage.desc = item.desc;
+                stage.layerId = item.layerId || 'STAGE_LAYER';
+                stage.layerName = item.layerName || 'StageLayer';
+                stage.layerDesc = item.layerDesc || '后处理场景图层';
+                return stage;
+            });
+
+            const stageComposite = new Cesium.PostProcessStageComposite({
+                name: options.name,
+                stages:stages
+            });
+            // 自定义属性
+            stageComposite.id = options.id || Util.getGuid();
+            stageComposite.desc = options.desc;
+            stageComposite.layerId = options.layerId || 'STAGE_LAYER';
+            stageComposite.layerName = options.layerName || 'StageLayer';
+            stageComposite.layerDesc = options.layerDesc || '后处理场景图层';
+            collection.add(stageComposite);
+            return stageComposite;
+        }
+    }
+
+    //#endregion
+
     //#region 动画时间轴
 
     /**

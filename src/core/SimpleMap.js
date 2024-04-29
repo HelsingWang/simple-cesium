@@ -101,7 +101,7 @@ export class SimpleMap extends ObjectBase {
                 console.warn(`Error creating tileset: ${error}`);
             }
 
-            // Fly to New York.
+            // Fly to Shanghai.
             viewer.scene.camera.flyTo({
                 destination: Cesium.Cartesian3.fromDegrees(121.4814, 31.2424, 500),
                 orientation: {
